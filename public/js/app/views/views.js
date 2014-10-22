@@ -34,7 +34,7 @@ define(["jquery", "backbone", "models/models", "text!templates/evaluator.html"],
                     //this.initSlider('.slider');
                 },
                 render : function() {
-                    this.$el.html(this.template({ model : new models.Evaluator() }))
+                    this.$el.html(this.template({ model : new models.Evaluator() }));
                     /*
                     this.$container.html('');
                     this.$el.html(this.compiledTemplate({ 
@@ -70,7 +70,7 @@ define(["jquery", "backbone", "models/models", "text!templates/evaluator.html"],
 
 
 
-        }
+        };
 
         
         return views;

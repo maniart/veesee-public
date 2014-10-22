@@ -19,6 +19,28 @@ module.exports = function(grunt) {
       }));
     };
   grunt.initConfig({
+    less: {
+      development: {
+        options: {
+          compress: true,
+          yuicompress: true,
+          optimization: 2
+        },
+        files: {
+          // target.css file: source.less file
+          "public/css/main.css": "public/css/main.less"
+        }
+      }
+    },
+    watch: {
+      styles: {
+        files: ['public/**/*.less'], // which files to watch
+        tasks: ['less'],
+        options: {
+          nospawn: true
+        }
+      }
+    },
     pkg: grunt.file.readJSON('package.json'),
     requirejs: {
       mobileJS: {
@@ -100,6 +122,8 @@ module.exports = function(grunt) {
     grunt.task.run(['requirejs:mobileJS', 'requirejs:mobileCSS']);
   });
 
+  grunt.loadNpmTasks('grunt-contrib-less');
+  grunt.loadNpmTasks('grunt-contrib-watch');
   grunt.loadNpmTasks('grunt-contrib-requirejs');
   grunt.loadNpmTasks('grunt-contrib-jshint');
   grunt.loadNpmTasks('grunt-plato');
@@ -108,5 +132,5 @@ module.exports = function(grunt) {
   grunt.registerTask('minify', ['requirejs:desktopJS', 'requirejs:mobileJS']);
   grunt.registerTask('complexity:report', 'plato');
   grunt.registerTask('build', ['desktopBuild', 'mobileBuild']);
-  grunt.registerTask('default', ['test', 'build', 'complexity:report']);
+  grunt.registerTask('default', ['test', 'build', 'complexity:report', 'watch']);
 };
