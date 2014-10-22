@@ -1,20 +1,19 @@
-// Collection.js
-// -------------
-define(["jquery","backbone","models/Model"],
+/**
+ * Describing all collections
+*/
+define(["jquery","backbone","models/models"], function($, Backbone, models) {
 
-  function($, Backbone, Model) {
+	var collections = {
+		
+		Evaluator : Backbone.Collection.extend({
+		
+			model : models.Evaluator
+		
+		})
+	
+	};
+    
 
-    // Creates a new Backbone Collection class object
-    var Collection = Backbone.Collection.extend({
+    return collections;
 
-      // Tells the Backbone Collection that all of it's models will be of type Model (listed up top as a dependency)
-      model: Model
-
-    });
-
-    // Returns the Model class
-    return Collection;
-
-  }
-
-);
+});

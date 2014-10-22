@@ -1,0 +1,190 @@
+{
+	"categories" : [
+
+		{
+			"title" : "team",
+			"index" : 1,
+			"steps" : [
+
+				{
+					"title" : "Depth of understanding",
+					"slideType" : "slidingScale",
+					"breakpoints" : [
+						"Avg. Masters degree in industry related field",
+						"Avg. 3 years of relevant industry experience",
+						"Avg. PhD in subject",
+						"Avg. 5 years of relevant industry experience"
+					]
+				},
+
+				{
+					"title" : "Execution Experience",
+					"slideType" : "slidingScale",
+					"breakpoints" : [
+						"First Startup",
+						"At least on the 2nd startup",
+						"At least one successful exits",
+						"More than 2 successful exits"
+					]
+					
+				},
+
+				{
+					"title" : "Team composition",
+					"slideType" : "slidingScale",
+					"breakpoints" : [
+						"1 member, Experience as product manager",
+						"1 member, Experience as C-suite (CEO/CTO/COO, etc.)",
+						"2 members, 1 Tech, 1 BizDev",
+						"4 members, 1 in BizDev, 2 Technology, 1 Design"
+					]
+				},
+
+				{
+					"title" : "External network",
+					"slideType" : "slidingScale",
+					"breakpoints" : [
+						"500+ LinkedIn connections and/or 2000+ Twitter followers and/or non-profit/meetup organization leader",
+						"2+ industry expert as formal advisor/board member",
+						"Top 5 incubator graduate, and/or achieved 3x crowdfunding for product",
+						"Awarded leaders in the industry"
+					]
+				}
+
+			]
+		},
+
+		{
+			"title" : "market",
+			"index" : 2,
+			"steps" : [
+
+				{
+					"title" : "Annual Spend",
+					"slideType" : "slidingScale",
+					"breakpoints" : [
+						"<$500M",
+						"$500M - $1B",
+						"$1B - $5B",
+						">$5B"
+					]
+				},
+
+				{
+					"title" : "Structure",
+					"slideType" : "mutuallyExclusive",
+					"breakpoints" : [
+						"Niche",
+						"Oligapoly / Fractured",
+						"Heterogeneous Customers",
+						"Homogenous Customers"
+					]
+					
+				}
+
+			]
+		},
+
+		{
+			"title" : "development",
+			"index" : 3,
+			"steps" : [
+
+				{
+					"title" : "Development Stage",
+					"slideType" : "slidingScale",
+					"breakpoints" : [
+						"In Development",
+						"Pre-revenue, Working Prototype, Being Tested by Potential Customers",
+						"Sporadic Revenue",
+						"Recurring Revenue and/or Profit"
+					]
+				},
+
+				{
+					"title" : "Hours Spent",
+					"slideType" : "slidingScale",
+					"breakpoints" : [
+						"<500 hours",
+						"500 - 2,000 hours",
+						"2,000 - 4,000 hours",
+						">4,000 hours"
+					]
+					
+				},
+
+				{
+					"title" : "Money Spent / Invested",
+					"slideType" : "slidingScale",
+					"breakpoints" : [
+						"<$25K",
+						"$25K - $100K",
+						"$100K - $250K",
+						">$250K"
+					]
+					
+				}
+
+			]
+		},
+
+		{
+			"title" : "competetive advantage",
+			"index" : 4,
+			"steps" : [
+
+				{
+					"title" : "competetive advantage",
+					"slideType" : "slidingScale",
+					"breakpoints" : [
+						"better design/niche focus",
+						"better pricing",
+						"better product offering",
+						"better core technology"
+					]
+				}
+
+			]
+		},
+
+		{
+			"title" : "traction",
+			"index" : 5,
+			"steps" : [
+
+				{
+					"title" : "traction",
+					"slideType" : "slidingScale",
+					"breakpoints" : [
+						"no customers yet",
+						"sporadic customer growth",
+						"extraordinary growth in first months / growth has slowed down",
+						"six months of accelerating growth"
+					]
+				}
+
+			]
+		},
+
+		{
+			"title" : "distribution channel",
+			"index" : 6,
+			"steps" : [
+
+				{
+					"title" : "distribution channel",
+					"slideType" : "slidingScale",
+					"breakpoints" : [
+						"submitted many requests for collaboration, some response for additional information",
+						"handful of statement of works",
+						"number of signed partnership agreements",
+						"multiple R&D, licensing, or supply chain partnership agreements"
+					]
+				}
+
+			]
+		}
+
+
+	]
+}
