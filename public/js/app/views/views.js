@@ -3,9 +3,15 @@
  * @module views
 */
 
-define(["jquery", "backbone", "models/models", "text!templates/evaluator.html"], function($, Backbone, models, template){
+define([
+    "jquery", 
+    "backbone", 
+    "models/models", 
+    "collections/collections",
+    "text!templates/evaluator.html",
+    "text!templates/evaluators.html"], 
+    function($, Backbone, models, collections, singleTpl, groupTpl){
 
-        window.models = models;
         views = {
 
 
@@ -13,7 +19,7 @@ define(["jquery", "backbone", "models/models", "text!templates/evaluator.html"],
 
                 el: '.evaluator',
 
-                template : _.template(template),
+                template : _.template(singleTpl),
 
 
                 initSlider : function(el) {
@@ -65,6 +71,20 @@ define(["jquery", "backbone", "models/models", "text!templates/evaluator.html"],
                     }
                 }
 
+
+            }),
+
+
+            Evaluators : Backbone.Model.extend({
+
+                el : '.evaluators',
+                tagName : 'section', 
+
+                render : function() {
+                    this.collection.each(function(model) {
+                        var evaluator = new views.Evaluator({ model : model })    
+                    });     
+                }
 
             })
 

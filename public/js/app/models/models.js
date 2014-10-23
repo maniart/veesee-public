@@ -11,8 +11,10 @@ define(["jquery", "backbone"], function($, Backbone) {
 
         Evaluator : Backbone.Model.extend({
 
-            initialize : function() {
 
+
+            initialize : function() {
+                console.warn('>> models.js >> initialized Model instance.')
             },
 
             defaults :  {

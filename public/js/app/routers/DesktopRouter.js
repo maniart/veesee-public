@@ -1,8 +1,8 @@
 // DesktopRouter.js
 // ----------------
-define(["jquery", "backbone", "models/models", "views/views", "collections/Collection"],
+define(["jquery", "backbone", "models/models", "views/views", "collections/collections"],
 
-    function($, Backbone, models, views, Collection) {
+    function($, Backbone, models, views, collections) {
 
         var DesktopRouter = Backbone.Router.extend({
 
@@ -30,8 +30,16 @@ define(["jquery", "backbone", "models/models", "views/views", "collections/Colle
             },
 
             app : function() {
-                new views.Evaluator();
-
+                var collection = new collections.Evaluators();
+                collection.fetch({
+                    success : function() {
+                        new views.Evaluators({ collection : collection });    
+                    },
+                    error : function() {
+                        console.error('DesktopRouter >> error while fetching for collection json data.')
+                    }
+                });
+                
             }
 
         });

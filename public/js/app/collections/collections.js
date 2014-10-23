@@ -7,8 +7,9 @@ define(["jquery","backbone","models/models"], function($, Backbone, models) {
 		
 		Evaluator : Backbone.Collection.extend({
 		
-			model : models.Evaluator
-		
+			model : models.Evaluator,
+			urlRoot : '/data'
+			
 		})
 	
 	};
