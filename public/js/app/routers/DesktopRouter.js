@@ -12,7 +12,7 @@ define(["jquery", "backbone", "models/models", "views/views", "collections/colle
                 Backbone.history.start();
 
             },
-
+            
             // All of your Backbone Routes (add more)
             routes: {
 
@@ -30,15 +30,19 @@ define(["jquery", "backbone", "models/models", "views/views", "collections/colle
             },
 
             app : function() {
+                
                 var collection = new collections.Evaluators();
                 collection.fetch({
-                    success : function() {
+                    success : function(collection, response) {
+                        debugger;
+                        console.log('>>>>> response is: ', response);
                         new views.Evaluators({ collection : collection });    
                     },
                     error : function() {
                         console.error('DesktopRouter >> error while fetching for collection json data.')
                     }
                 });
+
                 
             }
 

@@ -80,9 +80,17 @@ define([
                 el : '.evaluators',
                 tagName : 'section', 
 
+                initialize : function() {
+                    console.log('views.js >> rendering Evaluators view');
+                    this.render();
+                },
                 render : function() {
-                    this.collection.each(function(model) {
-                        var evaluator = new views.Evaluator({ model : model })    
+                    debugger;
+                    this.collection['categories'].each(function(category) {
+                        category['steps'].each(function(step) {
+                            var evaluator = new views.Evaluators({ model : step });    
+                        })
+                        //var evaluator = new views.Evaluator({ model : model })    
                     });     
                 }
 
