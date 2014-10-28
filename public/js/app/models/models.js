@@ -5,21 +5,19 @@
  * @extends Backbone.View
 */
 
-define(["jquery", "backbone"], function($, Backbone) {
+define([
+    
+    "jquery", 
+    "backbone"], 
 
-    models = {
+    function($, Backbone) {
+
+    var models = {
 
         Evaluator : Backbone.Model.extend({
 
-
-
             initialize : function() {
-                console.warn('>> models.js >> initialized Model instance.')
-            },
-
-            defaults :  {
-                name : 'mani',
-                last: 'nilchiani'
+                
             },
 
             validate : function(attrs) {
@@ -27,8 +25,6 @@ define(["jquery", "backbone"], function($, Backbone) {
             }
 
         })
-
-
 
     };
 

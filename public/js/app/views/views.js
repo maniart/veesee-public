@@ -4,20 +4,27 @@
 */
 
 define([
+    
     "jquery", 
     "backbone", 
     "models/models", 
     "collections/collections",
     "text!templates/evaluator.html",
     "text!templates/evaluators.html"], 
+    
     function($, Backbone, models, collections, singleTpl, groupTpl){
 
-        views = {
+        var views = {
 
 
             Evaluator : Backbone.View.extend({
 
-                el: '.evaluator',
+                
+                tagName : 'article',
+
+                attributes : {
+                    'class' : 'evaluator' 
+                },
 
                 template : _.template(singleTpl),
 
@@ -34,13 +41,15 @@ define([
                 },
                 
                 initialize : function() {
-                    console.warn('views : Evaluator.js >> initialize');
+
+                    console.warn('views : Evaluator.js >> initialize' , this.model.toJSON());
                     this.render();
                     //this.attachListeners();
                     //this.initSlider('.slider');
                 },
                 render : function() {
-                    this.$el.html(this.template({ model : new models.Evaluator() }));
+                    this.$el.html(this.template({ model : this.model.toJSON() }));
+                    console.warn('this.el is: ', this.el, ' this.$el is: ', this.$el);
                     /*
                     this.$container.html('');
                     this.$el.html(this.compiledTemplate({ 
@@ -75,23 +84,26 @@ define([
             }),
 
 
-            Evaluators : Backbone.Model.extend({
+            Evaluators : Backbone.View.extend({
 
-                el : '.evaluators',
+                
                 tagName : 'section', 
-
+                attributes : {
+                    'class' : 'evaluators-container'
+                },
                 initialize : function() {
-                    console.log('views.js >> rendering Evaluators view');
                     this.render();
                 },
                 render : function() {
-                    debugger;
-                    this.collection['categories'].each(function(category) {
-                        category['steps'].each(function(step) {
-                            var evaluator = new views.Evaluators({ model : step });    
-                        })
-                        //var evaluator = new views.Evaluator({ model : model })    
-                    });     
+                    console.log('views.js - this.collection: ', this);
+                    var self = this;
+                    this.collection.each(function(evaluatorModel) {
+                        var evaluatorView = new views.Evaluator({ model : evaluatorModel });
+                        self.$el.append(evaluatorView.el);                       
+                        
+                    });
+
+                       
                 }
 
             })

@@ -1,7 +1,13 @@
 /**
  * Describing all collections
 */
-define(["jquery","backbone","models/models"], function($, Backbone, models) {
+define([
+	
+	"jquery",
+	"backbone",
+	"models/models"], 
+	
+	function($, Backbone, models) {
 
 	var collections = {
 		
@@ -14,7 +20,6 @@ define(["jquery","backbone","models/models"], function($, Backbone, models) {
 	
 	};
     
-
     return collections;
 
 });

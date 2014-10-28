@@ -34,12 +34,12 @@ define(["jquery", "backbone", "models/models", "views/views", "collections/colle
                 var collection = new collections.Evaluators();
                 collection.fetch({
                     success : function(collection, response) {
-                        debugger;
-                        console.log('>>>>> response is: ', response);
+                        console.log('>>>>> response is: ', response, ' ', collection);
+                        
                         new views.Evaluators({ collection : collection });    
                     },
                     error : function() {
-                        console.error('DesktopRouter >> error while fetching for collection json data.')
+                        console.error('DesktopRouter >> error while fetching for collection json data.');
                     }
                 });
 
