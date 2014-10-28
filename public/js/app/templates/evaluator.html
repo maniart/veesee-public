@@ -1,4 +1,13 @@
-<!-- HTML Template -->
-<h1>
+<h1 class="title">
 	<%= model.title %>
 </h1>
+
+<div class="slider"></div>
+
+<ul class="breakpoints list-inline ">
+	<% _.each(model.breakpoints, function(breakpoint) {  %>
+	<li>
+		<%= breakpoint %>
+	</li>
+	<% }); %>
+</ul>

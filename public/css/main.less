@@ -1,3 +1,60 @@
+@import "lesshat";
+
 body {
+
+	background: white;
 	color: black;	
-}
+	font-size: 16px;
+	font-family: "Helvetica Neue", "Helvetica", Helvetica, Arial, sans-serif;
+
+} // body
+
+h1, h2, h3, h4, h5, h6 {
+	font-weight: 100;
+	letter-spacing: 1px;
+} // h1, h2, h3, h4, h5, h6 
+
+.evaluators-container {
+	
+	.evaluator {
+		
+		.title {
+			margin-bottom: 100px;
+			text-align: center;
+		} // .title
+
+		.slider {
+			
+			outline: 1px solid transparent;
+			height: .2em;
+			
+			.ui-slider-handle {
+				outline: 1px solid transparent;
+				top: -.6em;
+				background-color: white;
+				.box-shadow(rgba(255, 255, 255, 0.6) 0px 0px 30px 100px);
+				.border-radius(50%);
+			} // .ui-slider-handle
+
+			.ui-state-default {
+				background: white;	
+			} // .ui-state-default
+		
+		}
+
+		.breakpoints {
+			margin-top: 60px;
+			font-weight: 300;
+			font-size: 90%;
+			li {
+				width: 21%;
+				margin-left: 1.375rem;	
+				vertical-align: top;
+			} // li
+		} // .breakpoints 
+
+	} // .evaluator
+
+} // .evaluators-container
+
+

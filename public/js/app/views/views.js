@@ -29,9 +29,22 @@ define([
                 template : _.template(singleTpl),
 
 
-                initSlider : function(el) {
+                initSlider : function() {
 
                     console.warn('views : Evaluator.js >> Init Slider');
+                    var $slider = this.$el.find('.slider');
+                    var config = {
+                        value : 50,
+                        min : 0,
+                        max : 100,
+                        step : 1,
+                        slide : function(event, ui) {
+                            console.warn('Slider changed : ', event);
+
+                        }
+                    
+                    };
+                    $slider.slider(config);
                 },
                 
                 setSliderValue : function(data) {
@@ -44,6 +57,7 @@ define([
 
                     console.warn('views : Evaluator.js >> initialize' , this.model.toJSON());
                     this.render();
+                    this.initSlider();
                     //this.attachListeners();
                     //this.initSlider('.slider');
                 },
