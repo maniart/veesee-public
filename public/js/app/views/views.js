@@ -16,19 +16,33 @@ define([
 
         var views = {
 
-
             Evaluator : Backbone.View.extend({
-
                 
                 tagName : 'article',
-
                 attributes : {
                     'class' : 'evaluator' 
                 },
-
                 template : _.template(singleTpl),
-
-
+                animate : function(type) {
+                    switch(type) {
+                        case 'in':
+                            this.$el.addClass('fadeInDown animated').one('webkitAnimationEnd mozAnimationEnd MSAnimationEnd oanimationend animationend', function(){
+                                $(this).removeClass('fadeInDown animated');
+                            }); 
+                        break;
+                        case 'out':
+                            this.$el.addClass('fadeOutDown animated').one('webkitAnimationEnd mozAnimationEnd MSAnimationEnd oanimationend animationend', function(){
+                                $(this).removeClass('fadeOutDown animated');
+                            }); 
+                        break;
+                        default:
+                            this.$el.addClass('fadeInDown animated').one('webkitAnimationEnd mozAnimationEnd MSAnimationEnd oanimationend animationend', function(){
+                                $(this).removeClass('fadeInDown animated');
+                            }); 
+                        break;
+                    }
+                        
+                },
                 initSlider : function() {
 
                     console.warn('views : Evaluator.js >> Init Slider');
@@ -59,19 +73,11 @@ define([
                     this.render();
                     this.initSlider();
                     //this.attachListeners();
-                    //this.initSlider('.slider');
+
                 },
                 render : function() {
                     this.$el.html(this.template({ model : this.model.toJSON() }));
-                    /*
-                    this.$container.html('');
-                    this.$el.html(this.compiledTemplate({ 
-                        attributes : _.clone(this.model.attributes),
-                        steps : ['team', 'market', 'development stage', 'competetive advantage', 'traction', 'distribution channel']
-                    }));
-                    this.$container.append(this.$el);
                     this.animate();
-                    */
                     console.warn('views : Evaluator.js >> render');
                     return this;
                 },
