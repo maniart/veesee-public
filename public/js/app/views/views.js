@@ -20,9 +20,13 @@ define([
                 
                 tagName : 'article',
                 attributes : {
-                    'class' : 'evaluator' 
+                    'class' : 'evaluator hidden' 
                 },
                 template : _.template(singleTpl),
+                reveal : function() {
+                    this.$el.removeClass('hidden');
+                    this.animate();
+                },
                 animate : function(type) {
                     switch(type) {
                         case 'in':
@@ -32,7 +36,7 @@ define([
                         break;
                         case 'out':
                             this.$el.addClass('fadeOutDown animated').one('webkitAnimationEnd mozAnimationEnd MSAnimationEnd oanimationend animationend', function(){
-                                $(this).removeClass('fadeOutDown animated');
+                                $(this).removeClass('fadeOutDown animatepd');
                             }); 
                         break;
                         default:
@@ -77,28 +81,9 @@ define([
                 },
                 render : function() {
                     this.$el.html(this.template({ model : this.model.toJSON() }));
-                    this.animate();
                     console.warn('views : Evaluator.js >> render');
                     return this;
-                },
-
-                events : {
-                    
-                    'click .next' : function(event) {
-                        event.preventDefault();
-                        console.warn('views : Evaluator.js >> click next');
-                        
-                    },
-                    'click .prev' : function(event) {
-                        event.preventDefault();
-                        console.warn('views : Evaluator.js >> click prev');
-                    },
-                    'click .calculate' : function(event) {
-                        event.preventDefault();
-                        console.warn('views : Evaluator.js >> click calculate');
-                    }
                 }
-
 
             }),
 
@@ -111,8 +96,30 @@ define([
                 attributes : {
                     'class' : 'evaluators-container'
                 },
+                childViews : [],
                 initialize : function() {
+                    var self = this;
                     this.render();
+                    this.populateChildViews(function() {
+                        self.childViews[0].reveal();    
+                    });
+                    
+                },
+                populateChildViews : function(cb) {
+                    var self = this,
+                        evaluatorView;
+                    this.collection.each(function(evaluatorModel) {
+                    
+                        evaluatorView = new views.Evaluator({ model : evaluatorModel });
+                        self.childViews.push(evaluatorView);
+                        console.warn('___________________________ ', self.childViews);
+                        self.$el.append(evaluatorView.el);                       
+                        
+                    });
+                    // callback
+                    if(cb && typeof cb === 'function') {
+                        cb.call();  
+                    }    
                 },
                 render : function() {
                     this.$el.html(this.template({}));
@@ -126,7 +133,22 @@ define([
                     this.$container.append(self.$el);
 
                        
+                },
+
+                events : {
+                    
+                    'click .next' : function(event) {
+                        event.preventDefault();
+                        console.warn('**** views : Evaluator.js >> click next');
+                        
+                    },
+                    'click .prev' : function(event) {
+                        event.preventDefault();
+                        console.warn('**** views : Evaluator.js >> click prev');
+                    }
+                    
                 }
+
 
             })
 

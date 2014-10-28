@@ -8,10 +8,19 @@ body {
 	font-family: "Helvetica Neue", "Helvetica", Helvetica, Arial, sans-serif;
 
 } // body
+::-moz-selection { 
+    color: red;
+    background: yellow;
+} // ::-moz-selection
+::selection {
+    color: #333; 
+    background: #eee;
+} // ::selection
 
 h1, h2, h3, h4, h5, h6 {
 	font-weight: 100;
 	letter-spacing: 1px;
+	font-style: capitalize;
 } // h1, h2, h3, h4, h5, h6 
 
 .evaluators-container {
