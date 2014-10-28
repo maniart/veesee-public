@@ -49,7 +49,6 @@ define([
                 },
                 render : function() {
                     this.$el.html(this.template({ model : this.model.toJSON() }));
-                    console.warn('this.el is: ', this.el, ' this.$el is: ', this.$el);
                     /*
                     this.$container.html('');
                     this.$el.html(this.compiledTemplate({ 
@@ -86,7 +85,8 @@ define([
 
             Evaluators : Backbone.View.extend({
 
-                
+                $container : $('.app-container'),
+                template : _.template(groupTpl),
                 tagName : 'section', 
                 attributes : {
                     'class' : 'evaluators-container'
@@ -95,6 +95,7 @@ define([
                     this.render();
                 },
                 render : function() {
+                    this.$el.html(this.template({}));
                     console.log('views.js - this.collection: ', this);
                     var self = this;
                     this.collection.each(function(evaluatorModel) {
@@ -102,6 +103,7 @@ define([
                         self.$el.append(evaluatorView.el);                       
                         
                     });
+                    this.$container.append(self.$el);
 
                        
                 }
