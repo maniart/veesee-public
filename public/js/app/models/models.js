@@ -30,14 +30,6 @@ define([
             },
 
 
-        }),
-
-        Values : Backbone.Model.extend({
-            initialize : function() {
-                this.on('slider:value:change',function(data) {
-                    console.warn('title: ', data.title, ' sliderValue: ', data.sliderValue);
-                });
-            }
         })
 
     };

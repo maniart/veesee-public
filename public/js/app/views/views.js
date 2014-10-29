@@ -65,11 +65,11 @@ define([
                         value : 50,
                         min : 0,
                         max : 100,
-                        step : 1,
+                        step : (function() {
+                            //debugger;
+                            return self.model.get('sliderType') === 'mutuallyExclusive' ? 25 : 1; 
+                        })(),
                         slide : function(event, ui) {
-                            //console.warn('Slider changed : ', ui.value);
-                            //console.log('******************** ', self);
-                            //self.trigger('slider:value:change', { title: self.model.get('title'), sliderValue: ui.value });
                             self.model.set({'sliderValue' : ui.value});
                         }
                     
@@ -115,22 +115,55 @@ define([
                 },
                 next : function() {
                     var self = this;
-                    this.getCurrentChildView().conceal(function() {
-                        self.currentChildViewIndex ++;    
-                    });
-                    this.getCurrentChildView().reveal();
+                    switch(self.currentChildViewIndex) {
+                        case self.childViews.length - 1:
+                            console.log('there is no next');
+                            return;
+                            break;
+                        case self.childViews.length - 2:
+                            console.log('last slide');
+                            self.trigger('evaluators:steps:last');
+                            this.getCurrentChildView().conceal(function() {
+                                self.currentChildViewIndex ++;    
+                            });
+                            this.getCurrentChildView().reveal();
+                            break;
+                        default:
+                            this.getCurrentChildView().conceal(function() {
+                                self.currentChildViewIndex ++;    
+                            });
+                            this.getCurrentChildView().reveal();
+                            break;
+                    }
                 },
                 prev : function() {
                     var self = this;
+                    if(self.currentChildViewIndex === 0) { 
+                        console.log('there is no prev');
+                        return; 
+                    }
                     this.getCurrentChildView().conceal(function() {
                         self.currentChildViewIndex --;
                     });
                     this.getCurrentChildView().reveal();
                 },
-                
+                showCalculateBtn : function() {
+                    $('.calculate').removeClass('hidden');
+                    
+                },
+                attachListeners : function() {
+                    var self = this;
+                    this.on('evaluators:steps:last', function(event) {
+                        //debugger;
+                        console.warn('yo');
+                        this.showCalculateBtn();
+                    });
+                },
                 initialize : function() {
+                    console.warn(this.$calculateBtn);
                     var self = this;
                     this.render();
+                    this.attachListeners();
                     this.populateChildViews(function() {
                         self.getCurrentChildView().reveal();    
                     });
@@ -141,12 +174,13 @@ define([
                 populateChildViews : function(cb) {
                     var self = this,
                         evaluatorView;
+                    
                     this.collection.each(function(evaluatorModel) {
                     
                         evaluatorView = new views.Evaluator({ model : evaluatorModel });
                         self.childViews.push(evaluatorView);
                         console.warn('___________________________ ', self.childViews);
-                        self.$el.append(evaluatorView.el);                       
+                        self.$el.find('.evaluators').append(evaluatorView.el);                       
                         
                     });
                     // callback
@@ -178,8 +212,11 @@ define([
                     'click .prev' : function(event) {
                         event.preventDefault();
                         this.prev();
+                    },
+                    'click .calculate' : function(event) {
+                        event.preventDefault();
+                        console.log('calculate clicked');
                     }
-
                     
                 }
 

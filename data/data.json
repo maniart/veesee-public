@@ -2,7 +2,7 @@
 	{
 		"title" : "Depth of understanding",
 		"category" : "team",
-		"slideType" : "slidingScale",
+		"sliderType" : "slidingScale",
 		"breakpoints" : [
 			"Avg. Masters degree in industry related field",
 			"Avg. 3 years of relevant industry experience",
@@ -14,7 +14,7 @@
 	{
 		"title" : "Execution Experience",
 		"category" : "team",
-		"slideType" : "slidingScale",
+		"sliderType" : "slidingScale",
 		"breakpoints" : [
 			"First Startup",
 			"At least on the 2nd startup",
@@ -27,7 +27,7 @@
 	{
 		"title" : "Team composition",
 		"category" : "team",
-		"slideType" : "slidingScale",
+		"sliderType" : "slidingScale",
 		"breakpoints" : [
 			"1 member, Experience as product manager",
 			"1 member, Experience as C-suite (CEO/CTO/COO, etc.)",
@@ -39,7 +39,7 @@
 	{
 		"title" : "External network",
 		"category" : "team",
-		"slideType" : "slidingScale",
+		"sliderType" : "slidingScale",
 		"breakpoints" : [
 			"500+ LinkedIn connections and/or 2000+ Twitter followers and/or non-profit/meetup organization leader",
 			"2+ industry expert as formal advisor/board member",
@@ -51,7 +51,7 @@
 	{
 		"title" : "Annual Spend",
 		"category" : "market",
-		"slideType" : "slidingScale",
+		"sliderType" : "slidingScale",
 		"breakpoints" : [
 			"<$500M",
 			"$500M - $1B",
@@ -63,7 +63,7 @@
 	{
 		"title" : "Structure",
 		"category" : "market",
-		"slideType" : "mutuallyExclusive",
+		"sliderType" : "mutuallyExclusive",
 		"breakpoints" : [
 			"Niche",
 			"Oligapoly / Fractured",
@@ -76,7 +76,7 @@
 	{
 		"title" : "Development Stage",
 		"category" : "development",
-		"slideType" : "slidingScale",
+		"sliderType" : "slidingScale",
 		"breakpoints" : [
 			"In Development",
 			"Pre-revenue, Working Prototype, Being Tested by Potential Customers",
@@ -88,7 +88,7 @@
 	{
 		"title" : "Hours Spent",
 		"category" : "development",
-		"slideType" : "slidingScale",
+		"sliderType" : "slidingScale",
 		"breakpoints" : [
 			"<500 hours",
 			"500 - 2,000 hours",
@@ -101,7 +101,7 @@
 	{
 		"title" : "Money Spent / Invested",
 		"category" : "development",
-		"slideType" : "slidingScale",
+		"sliderType" : "slidingScale",
 		"breakpoints" : [
 			"<$25K",
 			"$25K - $100K",
@@ -114,7 +114,7 @@
 	{
 		"title" : "competetive advantage",
 		"category" : "competetive advantage",
-		"slideType" : "slidingScale",
+		"sliderType" : "slidingScale",
 		"breakpoints" : [
 			"better design/niche focus",
 			"better pricing",
@@ -125,7 +125,7 @@
 	{
 		"title" : "traction",
 		"category" : "traction",
-		"slideType" : "slidingScale",
+		"sliderType" : "slidingScale",
 		"breakpoints" : [
 			"no customers yet",
 			"sporadic customer growth",
@@ -136,7 +136,7 @@
 	{
 		"title" : "distribution channel",
 		"category" : "distribution channel",
-		"slideType" : "slidingScale",
+		"sliderType" : "slidingScale",
 		"breakpoints" : [
 			"submitted many requests for collaboration, some response for additional information",
 			"handful of statement of works",

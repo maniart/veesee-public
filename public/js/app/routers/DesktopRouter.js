@@ -30,12 +30,11 @@ define(["jquery", "backbone", "models/models", "views/views", "collections/colle
             },
 
             app : function() {
-                var valuesModel = new models.Values();
-                console.warn('here is the model: ', valuesModel);
+                
                 var collection = new collections.Evaluators();
                 collection.fetch({
                     success : function(collection, response) {
-                        //console.log('>>>>> response is: ', response, ' ', collection);
+                        console.warn('^^^^ collection: ', collection);
                         new views.Evaluators({ collection : collection });    
                     },
                     error : function() {
