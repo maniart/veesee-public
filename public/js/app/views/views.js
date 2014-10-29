@@ -23,13 +23,19 @@ define([
                     'class' : 'evaluator hidden' 
                 },
                 template : _.template(singleTpl),
-                reveal : function() {
+                reveal : function(cb) {
                     this.$el.removeClass('hidden');
-                    this.animate();
+                    this.animate('in');
+                    if(cb && typeof cb === 'function') {
+                        cb.call();
+                    }
                 },
-                conceal : function() {
+                conceal : function(cb) {
                     this.animate('out');
                     this.$el.addClass('hidden');
+                    if(cb && typeof cb === 'function') {
+                        cb.call();
+                    }
                 },
                 animate : function(type) {
                     switch(type) {
@@ -52,7 +58,7 @@ define([
                         
                 },
                 initSlider : function() {
-
+                    var self = this;
                     console.warn('views : Evaluator.js >> Init Slider');
                     var $slider = this.$el.find('.slider');
                     var config = {
@@ -61,8 +67,10 @@ define([
                         max : 100,
                         step : 1,
                         slide : function(event, ui) {
-                            console.warn('Slider changed : ', event);
-
+                            //console.warn('Slider changed : ', ui.value);
+                            //console.log('******************** ', self);
+                            //self.trigger('slider:value:change', { title: self.model.get('title'), sliderValue: ui.value });
+                            self.model.set({'sliderValue' : ui.value});
                         }
                     
                     };
@@ -80,7 +88,7 @@ define([
                     console.warn('views : Evaluator.js >> initialize' , this.model.toJSON());
                     this.render();
                     this.initSlider();
-                    //this.attachListeners();
+                    
 
                 },
                 render : function() {
@@ -102,26 +110,32 @@ define([
                 },
                 childViews : [],
                 currentChildViewIndex : 0,
+                getCurrentChildView : function() {
+                    return this.childViews[this.currentChildViewIndex];
+                },
                 next : function() {
-                    var currentChildView,
-                        nextChildView;
-                    //debugger;
-                    currentChildView = this.childViews[this.currentChildViewIndex];
-                    currentChildView.conceal();
-                    this.currentChildViewIndex ++;
-                    nextChildView = this.childViews[this.currentChildViewIndex];
-                    nextChildView.reveal();
+                    var self = this;
+                    this.getCurrentChildView().conceal(function() {
+                        self.currentChildViewIndex ++;    
+                    });
+                    this.getCurrentChildView().reveal();
                 },
                 prev : function() {
-
+                    var self = this;
+                    this.getCurrentChildView().conceal(function() {
+                        self.currentChildViewIndex --;
+                    });
+                    this.getCurrentChildView().reveal();
                 },
                 
                 initialize : function() {
                     var self = this;
                     this.render();
                     this.populateChildViews(function() {
-                        self.childViews[0].reveal();    
+                        self.getCurrentChildView().reveal();    
                     });
+
+                    
                     
                 },
                 populateChildViews : function(cb) {
@@ -163,8 +177,9 @@ define([
                     },
                     'click .prev' : function(event) {
                         event.preventDefault();
-                        console.warn('**** views : Evaluator.js >> click prev');
+                        this.prev();
                     }
+
                     
                 }
 
