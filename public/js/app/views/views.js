@@ -27,6 +27,10 @@ define([
                     this.$el.removeClass('hidden');
                     this.animate();
                 },
+                conceal : function() {
+                    this.animate('out');
+                    this.$el.addClass('hidden');
+                },
                 animate : function(type) {
                     switch(type) {
                         case 'in':
@@ -97,6 +101,21 @@ define([
                     'class' : 'evaluators-container'
                 },
                 childViews : [],
+                currentChildViewIndex : 0,
+                next : function() {
+                    var currentChildView,
+                        nextChildView;
+                    //debugger;
+                    currentChildView = this.childViews[this.currentChildViewIndex];
+                    currentChildView.conceal();
+                    this.currentChildViewIndex ++;
+                    nextChildView = this.childViews[this.currentChildViewIndex];
+                    nextChildView.reveal();
+                },
+                prev : function() {
+
+                },
+                
                 initialize : function() {
                     var self = this;
                     this.render();
@@ -139,7 +158,7 @@ define([
                     
                     'click .next' : function(event) {
                         event.preventDefault();
-                        console.warn('**** views : Evaluator.js >> click next');
+                        this.next();
                         
                     },
                     'click .prev' : function(event) {
