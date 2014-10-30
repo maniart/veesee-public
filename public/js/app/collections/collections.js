@@ -14,7 +14,7 @@ define([
 		Evaluators : Backbone.Collection.extend({
 		
 			model : models.Evaluator,
-			url : '/data',
+			url : '/api',
 			save : function() {
 				console.warn('****** collection is saving...');
 				Backbone.sync('create', this, {

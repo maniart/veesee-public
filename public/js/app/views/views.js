@@ -85,7 +85,7 @@ define([
                 
                 initialize : function() {
 
-                    console.warn('views : Evaluator.js >> initialize' , this.model.toJSON());
+                    console.warn('views : Evaluator.js >> collection' , this.model.collection);
                     this.render();
                     this.initSlider();
                     
@@ -149,7 +149,7 @@ define([
                 },
                 showCalculateBtn : function() {
                     $('.calculate').removeClass('hidden');
-                    
+
                 },
                 attachListeners : function() {
                     var self = this;
@@ -160,7 +160,6 @@ define([
                     });
                 },
                 initialize : function() {
-                    console.warn(this.$calculateBtn);
                     var self = this;
                     this.render();
                     this.attachListeners();
@@ -215,7 +214,11 @@ define([
                     },
                     'click .calculate' : function(event) {
                         event.preventDefault();
-                        console.log('calculate clicked');
+                        console.log('calculate clicked  ');
+                        this.childViews[0].model.collection.save();
+
+
+
                     }
                     
                 }

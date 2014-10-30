@@ -1,6 +1,11 @@
 // DesktopRouter.js
 // ----------------
-define(["jquery", "backbone", "models/models", "views/views", "collections/collections"],
+define([
+    "jquery", 
+    "backbone", 
+    "models/models", 
+    "views/views", 
+    "collections/collections"],
 
     function($, Backbone, models, views, collections) {
 
@@ -30,11 +35,10 @@ define(["jquery", "backbone", "models/models", "views/views", "collections/colle
             },
 
             app : function() {
-                
-                var collection = new collections.Evaluators();
-                collection.fetch({
+                this.collection = new collections.Evaluators();
+                this.collection.fetch({
                     success : function(collection, response) {
-                        console.warn('^^^^ collection: ', collection);
+                        console.warn('^^^^ this.collection: ', collection);
                         new views.Evaluators({ collection : collection });    
                     },
                     error : function() {
@@ -46,9 +50,10 @@ define(["jquery", "backbone", "models/models", "views/views", "collections/colle
             }
 
         });
-
+        
         // Returns the DesktopRouter class
         return DesktopRouter;
+                
 
     }
 

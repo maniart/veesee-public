@@ -5,7 +5,7 @@ var logger = require('morgan');
 var bodyParser = require('body-parser');
 var npid = require('npid');
 var fs = require('fs');
-var data = require('./routes/data');
+var api = require('./routes/api');
 
 var app = express();
 
@@ -16,7 +16,7 @@ app.use(logger('dev'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded(  ));
 app.use(express.static(path.join(__dirname, 'public')));
-app.use('/data', data);
+app.use('/api', api);
 
 app.set('port', process.env.PORT || 3030);
 
