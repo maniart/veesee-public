@@ -19,7 +19,7 @@ var merge = function(collection) {
 		);
 	});
 
-	return reference;
+	return categories;
 };
 
 var calculateCategoryFactors = function(categories) {
@@ -51,26 +51,68 @@ var calculateCategorySum = function(categories) {
 	return categories;
 };
 
+var defineBuckets = function(categories) {
 
+	_.each(categories, function(category) {
+		_.extend(
+			category, { bucket : _.find(
+				buckets, function(bucket) {
+					console.log(category.sum, ' ', bucket.min, ' ', bucket.max, '\n');
+
+					return category.factor >= bucket.min && category.factor <= bucket.max; 
+				}
+			)}
+		);
+	});
+
+	return categories;
+
+};
+
+var addBucketWeight = function(categories) {
+
+	_.each(categories, function(category) {
+		category.sum *= category.bucket.factor;
+	});
+
+	return categories;
+};
+
+var defineBucketCode = function(categories) {
+
+	_.each(categories, function(category){
+		_.extend(
+			category, { 
+				code : category.bucket.zone === 1 ? [1, 0, 0] : 
+					category.bucket.zone === 2 ? 
+					[0, 1, 0] : 
+					[0, 0, 1]  
+			}
+		);
+	});
+
+	return categories;
+};
 
 var calculate = function(collection) {
 	
-	//console.log(merge(collection));
-	//console.log('&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&\n');
+	console.log(util.inspect(
+		addBucketWeight(
+			defineBucketCode(
+				defineBuckets(
+					calculateCategorySum(
+						calculateCategoryFactors(
+							merge(collection)
+						)
+					)
+				)
+			)
+		), 
+
+		{showHidden: false, depth: null})
+	);
 	
-	console.log(util.inspect(calculateCategorySum(calculateCategoryFactors(merge(collection))), {showHidden: false, depth: null}));
-	
-	//console.log('*********************************************************\n', util.inspect(merge(collection), {showHidden: false, depth: null}));
 };
-// ALL numbers, max values and buckets should live here
-// ALL calclulations should happen here.
-// ONLY expose the BARE MINIMUM in data.json 
-/* for the top seve, we are not yelding a valuation, but this:
-		Based on your input, there are too many good things going on for you. Congratulations. Unfortunately, the model has been calibrated against companies with pre-money valuations between $1.2M and $7.1M. Based on the information, you are outside of this range, and we suggest you contact a valuation provider for further details.
-	*/
-
-
-
 
 module.exports = {
 	calculate : calculate
