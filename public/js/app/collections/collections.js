@@ -24,7 +24,7 @@ define([
 					error : function(err) {
 						console.warn('****** collection failed to save.');
 					}
-				})
+				});
 				
 			}
 			

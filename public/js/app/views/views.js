@@ -62,7 +62,7 @@ define([
                     console.warn('views : Evaluator.js >> Init Slider');
                     var $slider = this.$el.find('.slider');
                     var config = {
-                        value : 50,
+                        value : self.model.get('sliderValue'),
                         min : 0,
                         max : 100,
                         step : (function() {
@@ -119,7 +119,6 @@ define([
                         case self.childViews.length - 1:
                             console.log('there is no next');
                             return;
-                            break;
                         case self.childViews.length - 2:
                             console.log('last slide');
                             self.trigger('evaluators:steps:last');

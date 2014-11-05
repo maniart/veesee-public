@@ -19,15 +19,15 @@ define([
             initialize : function() {
                 this.on('change', function(model) {
                     console.warn(model.get('sliderValue'));
-                })        
+                });      
             },
             defaults : {
-                'sliderValue' : 0
+                'sliderValue' : 50
             },
 
             validate : function(attrs) {
 
-            },
+            }
 
 
         })

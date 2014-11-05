@@ -45,11 +45,11 @@
   <div class="row">
     <div class="col-md-6">
       <h2 class="header">Maintainability <a href="http://blogs.msdn.com/b/codeanalysis/archive/2007/11/20/maintainability-index-range-and-meaning.aspx"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="A value between 0 and 100 that represents the relative ease of maintaining the code. A high value means better maintainability." data-original-title="Maintainability Index"></i></a></h2>
-      <p class="stat">78.71</p>
+      <p class="stat">78.74</p>
     </div>
     <div class="col-md-6">
       <h2 class="header">Lines of code <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC"></i></h2>
-      <p class="stat">54</p>
+      <p class="stat">58</p>
     </div>
   </div>
   <div class="row historical">
@@ -92,7 +92,12 @@
   <div class="row">
     <textarea id="file-source" class="col-md-12">// DesktopRouter.js
 // ----------------
-define([&quot;jquery&quot;, &quot;backbone&quot;, &quot;models/models&quot;, &quot;views/views&quot;, &quot;collections/collections&quot;],
+define([
+    &quot;jquery&quot;, 
+    &quot;backbone&quot;, 
+    &quot;models/models&quot;, 
+    &quot;views/views&quot;, 
+    &quot;collections/collections&quot;],
 
     function($, Backbone, models, views, collections) {
 
@@ -122,12 +127,10 @@ define([&quot;jquery&quot;, &quot;backbone&quot;, &quot;models/models&quot;, &qu
             },
 
             app : function() {
-                
-                var collection = new collections.Evaluators();
-                collection.fetch({
+                this.collection = new collections.Evaluators();
+                this.collection.fetch({
                     success : function(collection, response) {
-                        console.log(&#039;&gt;&gt;&gt;&gt;&gt; response is: &#039;, response, &#039; &#039;, collection);
-                        
+                        console.warn(&#039;^^^^ this.collection: &#039;, collection);
                         new views.Evaluators({ collection : collection });    
                     },
                     error : function() {
@@ -139,9 +142,10 @@ define([&quot;jquery&quot;, &quot;backbone&quot;, &quot;models/models&quot;, &qu
             }
 
         });
-
+        
         // Returns the DesktopRouter class
         return DesktopRouter;
+                
 
     }
 
