@@ -57,8 +57,6 @@ var defineBuckets = function(categories) {
 		_.extend(
 			category, { bucket : _.find(
 				buckets, function(bucket) {
-					//console.log(category.sum, ' ', bucket.min, ' ', bucket.max, '\n');
-
 					return category.factor >= bucket.min && category.factor <= bucket.max; 
 				}
 			)}
@@ -81,9 +79,8 @@ var addBucketWeight = function(categories) {
 var defineBucketCode = function(categories) {
 
 	var code;
-	console.log('________________________________________________________________');
 	_.each(categories, function(category){
-		/*
+		
 		if(category.bucket.zone === 1) {
 			code = [1, 0, 0];
 		} else if(category.bucket.zone === 2) {
@@ -91,19 +88,17 @@ var defineBucketCode = function(categories) {
 		} else {
 			code = [0, 0, 1];
 		}
-		*/
-		console.log(category.bucket);
+			
 		_.extend(
 			category, { 
-				code : code 
+				code : code
 			}
 		);
 	});
-
 	return categories;
 };
 
-sumAllCategories = function(categories) {
+var sumAllCategories = function(categories) {
 
 	return _.reduce(
 		categories, function(memo, category, index, list) {
@@ -115,52 +110,42 @@ sumAllCategories = function(categories) {
 
 };
 
-var addZoneWeight = function(categories) {
+var addZoneWeight = function(sum) {
 
-	return _.reduce(
-		categories, function(memo, category, index, list){
-			_.each(category.code, function(digit, index, list){
-				memo[index] += digit;
-			});
-		}, [0, 0, 0]
-	);
+	var finalZoneCode = [0, 0, 0],
+		zoneWeight;
+
+	_.each(categories, function(category) {
+		_.each(category.code, function(code, index) {
+			finalZoneCode[index] += code;
+		})
+	});
+
+	finalZoneCode = finalZoneCode.join('');
+	zoneWeight = zoneTable[finalZoneCode];
+
+	return sum * zoneWeight;
+	
 
 };
 
 var calculate = function(collection) {
-				
-				console.log(
-					sumAllCategories(
-						defineBucketCode(
-							defineBuckets(
-								calculateCategorySum(
-									calculateCategoryFactors(
-										merge(collection)
-									)
-								)
+		
+	console.log(
+		addZoneWeight(
+			sumAllCategories(
+				defineBucketCode(
+					defineBuckets(
+						calculateCategorySum(
+							calculateCategoryFactors(
+								merge(collection)
 							)
 						)
 					)
-				);
-
-
-	/*
-	console.log(util.inspect(
-					defineBucketCode(
-						defineBuckets(
-							calculateCategorySum(
-								calculateCategoryFactors(
-									merge(collection)
-								)
-							)
-						)
-					)
-				
-			
-		,
-		{showHidden: false, depth: null})
+				)
+			)
+		)
 	);
-*/
 	
 };
 
