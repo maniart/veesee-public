@@ -1,0 +1,94 @@
+[
+    {
+        "title": "team",
+        "maxValue": 1100000,
+        "index": 1,
+        "steps": [
+            {
+                "title": "Depth of understanding",
+                "weight": 0.4
+            },
+            {
+                "title": "Execution Experience",
+                "weight": 0.4
+            },
+            {
+                "title": "Team composition",
+                "weight": 0.1
+            },
+            {
+                "title": "External network",
+                "weight": 0.1,
+                "slideType": "slidingScale"
+            }
+        ]
+    },
+    {
+        "title": "market",
+        "maxValue": 700000,
+        "index": 2,
+        "steps": [
+            {
+                "title": "Annual Spend",
+                "weight": 0.5
+            },
+            {
+                "title": "Structure",
+                "weight": 0.5
+            }
+        ]
+    },
+    {
+        "title": "development",
+        "maxValue": 500000,
+        "index": 3,
+        "steps": [
+            {
+                "title": "Development Stage",
+                "weight": 0.5
+            },
+            {
+                "title": "Hours Spent",
+                "weight": 0.25
+            },
+            {
+                "title": "Money Spent / Invested",
+                "weight": 0.25
+            }
+        ]
+    },
+    {
+        "title": "competetive advantage",
+        "maxValue": 400000,
+        "index": 4,
+        "steps": [
+            {
+                "title": "competetive advantage",
+                "weight": 1
+            }
+        ]
+    },
+    {
+        "title": "traction",
+        "maxValue": 300000,
+        "index": 5,
+        "steps": [
+            {
+                "title": "traction",
+                "weight": 1
+            }
+        ]
+    },
+    {
+        "title": "distribution channel",
+        "maxValue": 200000,
+        "index": 6,
+        "steps": [
+            {
+                "title": "distribution channel",
+                "weight": 1
+            }
+        ]
+    }
+]
+    

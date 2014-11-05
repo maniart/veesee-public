@@ -1,6 +1,7 @@
 var _ = require('underscore');
 var util = require('util');
-var reference = require('./reference/reference.json');
+var categories = require('./reference/categories.json');
+var buckets = require('./reference/buckets.json');
 var zoneTable = require('./reference/zonetable.json');
 
 var merge = function(collection) {
@@ -9,7 +10,7 @@ var merge = function(collection) {
 		_.extend(
 			_.findWhere(
 				_.findWhere(
-					reference.categories, {
+					categories, {
 						title : model.category 
 					}).steps, {
 						title : model.title
@@ -21,9 +22,9 @@ var merge = function(collection) {
 	return reference;
 };
 
-var calculateCategoryFactors = function(reference) {
+var calculateCategoryFactors = function(categories) {
 	
-	_.each(reference.categories, function(category) {
+	_.each(categories, function(category) {
 		_.extend(category, { 
 			factor : _.reduce(
 				_.map(category.steps, function(step) {
@@ -35,19 +36,19 @@ var calculateCategoryFactors = function(reference) {
 		})
 	});
 
-	return reference;
+	return categories;
 
 };
 
-var calculateCategorySum = function(reference) {
+var calculateCategorySum = function(categories) {
 
-	_.each(reference.categories, function(category) {
+	_.each(categories, function(category) {
 		_.extend(
 			category, { sum : category.factor * category.maxValue }
 		);
 	});
 
-	return reference;
+	return categories;
 };
 
 
