@@ -1,8 +1,8 @@
 var _ = require('underscore');
 var util = require('util');
-var categories = require('./reference/categories.json');
-var buckets = require('./reference/buckets.json');
-var zoneTable = require('./reference/zonetable.json');
+var categories = require('../reference/categories.json');
+var buckets = require('../reference/buckets.json');
+var zoneTable = require('../reference/zonetable.json');
 
 var merge = function(collection) {
 	

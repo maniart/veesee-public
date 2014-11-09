@@ -7,6 +7,7 @@ var npid = require('npid');
 var fs = require('fs');
 var debug = require('debug')('veesee');
 var api = require('./routes/api');
+var home = require('./routes/home');
 
 var app = express();
 
@@ -19,7 +20,10 @@ app.use(bodyParser.urlencoded({
   extended: true
 }));
 app.use(express.static(path.join(__dirname, 'public')));
+
+app.use('/', home);
 app.use('/api', api);
+
 
 app.set('port', process.env.PORT || 3030);
 

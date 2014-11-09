@@ -1,5 +1,5 @@
 var express = require("express");
-var calculator = require('../calculator');
+var calculator = require('../controllers/calculator');
 var router = express.Router();
 var data = require("../data/data.json")
 

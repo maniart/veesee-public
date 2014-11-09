@@ -29,8 +29,16 @@ define([
 
             index: function() {
 
-                // Instantiates a new view which will render the header text to the page
-                //new View();
+                this.collection = new collections.Evaluators();
+                this.collection.fetch({
+                    success : function(collection, response) {
+                        console.warn('^^^^ this.collection: ', collection);
+                        new views.Evaluators({ collection : collection });    
+                    },
+                    error : function() {
+                        console.error('DesktopRouter >> error while fetching for collection json data.');
+                    }
+                });
 
             },
 
