@@ -5,6 +5,7 @@ var logger = require('morgan');
 var bodyParser = require('body-parser');
 var npid = require('npid');
 var fs = require('fs');
+var debug = require('debug')('veesee');
 var api = require('./routes/api');
 
 var app = express();
@@ -14,7 +15,9 @@ var app = express();
 
 app.use(logger('dev'));
 app.use(bodyParser.json());
-app.use(bodyParser.urlencoded(  ));
+app.use(bodyParser.urlencoded({
+  extended: true
+}));
 app.use(express.static(path.join(__dirname, 'public')));
 app.use('/api', api);
 
@@ -101,4 +104,7 @@ app.use(function(err, req, res, next) {
     });
 });
 
-module.exports = app;
+var server = app.listen(app.get('port'), function() {
+  debug('VeeSee server listening on port ' + server.address().port);
+});
+
