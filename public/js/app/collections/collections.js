@@ -16,10 +16,14 @@ define([
 			model : models.Evaluator,
 			url : '/api',
 			save : function() {
-				console.warn('****** collection is saving...');
 				Backbone.sync('create', this, {
-					success : function(jqXHR) {
-						console.warn('****** collection is saved successfully.');
+					success : function(response, status, jqXHR) {
+						if(jqXHR.status === 200) {
+							console.log('Response success: ', response);
+						} else {
+							console.error('something went wrong?');
+						}
+						
 					},
 					error : function(err) {
 						console.warn('****** collection failed to save.');
