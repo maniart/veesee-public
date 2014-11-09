@@ -10,13 +10,10 @@ router.get('/', function(req, res) {
 });
 
 router.post('/', function(req, res) {
-	console.log('received post request. Saving collection');
-	calculator.calculate(req.body);
-	res.send({
-        redirect: '#app'
-    });
+	console.log('received post request. Calculation result: ', calculator.calculate(req.body));
+	
+	res.json(calculator.calculate(req.body));
     
-    res.end();
 });	
 
 

@@ -58,6 +58,7 @@
     "express": "^4.9.8",
     "morgan": "^1.5.0",
     "npid": "^0.4.0",
+    "numeral": "^1.5.3",
     "static-favicon": "^2.0.0-alpha",
     "underscore": "^1.7.0"
   }

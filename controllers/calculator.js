@@ -1,5 +1,6 @@
 var _ = require('underscore');
 var util = require('util');
+var numeral = require('numeral');
 var categories = require('../reference/categories.json');
 var buckets = require('../reference/buckets.json');
 var zoneTable = require('../reference/zonetable.json');
@@ -129,16 +130,62 @@ var addZoneWeight = function(sum) {
 
 };
 
-var calculate = function(collection) {
+var calculateFloorCeiling = function(sum) {
+
+	return {
+		floor : sum * .9,
+		ceiling : sum * 1.1
+	};
+
+};
+
+var format = function(input) {
+
+	if (typeof input === 'object') {
 		
+		_.each(input, function(value, key) {
+			input[key] = numeral(value).format('($ 0.00 a)');
+		});
+		return input;
+	} else if(typeof input === 'number') {
+		return numeral(value).format('($ 0.00 a)'); 
+	} else {
+		throw new TypeError('`format` method only accepts numbers and objects');
+	}
+
+};
+
+var calculate = function(collection) {			
+
 	console.log(
-		addZoneWeight(
-			sumAllCategories(
-				defineBucketCode(
-					defineBuckets(
-						calculateCategorySum(
-							calculateCategoryFactors(
-								merge(collection)
+		format(
+			calculateFloorCeiling(
+				addZoneWeight(
+					sumAllCategories(
+						defineBucketCode(
+							defineBuckets(
+								calculateCategorySum(
+									calculateCategoryFactors(
+										merge(collection)
+									)
+								)
+							)
+						)
+					)
+				)
+			)
+		)
+	);
+	return format(
+		calculateFloorCeiling(
+			addZoneWeight(
+				sumAllCategories(
+					defineBucketCode(
+						defineBuckets(
+							calculateCategorySum(
+								calculateCategoryFactors(
+									merge(collection)
+								)
 							)
 						)
 					)
