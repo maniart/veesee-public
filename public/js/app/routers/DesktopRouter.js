@@ -55,6 +55,10 @@ define([
                 });
 
                 
+            }, 
+
+            result : function(arg) {
+                console.log('___---__-- ' ,arg);
             }
 
         });

@@ -1,7 +1,7 @@
 [
     {
         "title": "team",
-        "maxValue": 1100000,
+        "maxValue": 1200000,
         "index": 1,
         "steps": [
             {
@@ -25,7 +25,7 @@
     },
     {
         "title": "market",
-        "maxValue": 700000,
+        "maxValue": 300000,
         "index": 2,
         "steps": [
             {
@@ -59,7 +59,7 @@
     },
     {
         "title": "competetive advantage",
-        "maxValue": 400000,
+        "maxValue": 500000,
         "index": 4,
         "steps": [
             {
@@ -70,7 +70,7 @@
     },
     {
         "title": "traction",
-        "maxValue": 300000,
+        "maxValue": 700000,
         "index": 5,
         "steps": [
             {
@@ -81,7 +81,7 @@
     },
     {
         "title": "distribution channel",
-        "maxValue": 200000,
+        "maxValue": 300000,
         "index": 6,
         "steps": [
             {

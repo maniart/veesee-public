@@ -5,9 +5,10 @@ define([
 	
 	"jquery",
 	"backbone",
-	"models/models"], 
+	"models/models", 
+	"init/DesktopInit"], 
 	
-	function($, Backbone, models) {
+	function($, Backbone, models, DesktopInit) {
 
 	var collections = {
 		
@@ -19,7 +20,9 @@ define([
 				Backbone.sync('create', this, {
 					success : function(response, status, jqXHR) {
 						if(jqXHR.status === 200) {
-							console.log('Response success: ', response);
+							console.log('Response success: ', jqXHR);
+							alert(jqXHR.responseText);
+
 						} else {
 							console.error('something went wrong?');
 						}
