@@ -18,8 +18,7 @@
             },
             {
                 "title": "External network",
-                "weight": 0.1,
-                "slideType": "slidingScale"
+                "weight": 0.1
             }
         ]
     },

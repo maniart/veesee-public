@@ -27,12 +27,12 @@ define([
 
             },
 
-            index: function() {
+            home: function() {
 
-                this.collection = new collections.Evaluators();
+                this.model = new models.Home();
+                
                 this.collection.fetch({
                     success : function(collection, response) {
-                        console.warn('^^^^ this.collection: ', collection);
                         new views.Evaluators({ collection : collection });    
                     },
                     error : function() {
@@ -46,7 +46,6 @@ define([
                 this.collection = new collections.Evaluators();
                 this.collection.fetch({
                     success : function(collection, response) {
-                        console.warn('^^^^ this.collection: ', collection);
                         new views.Evaluators({ collection : collection });    
                     },
                     error : function() {

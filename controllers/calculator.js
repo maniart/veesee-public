@@ -133,6 +133,7 @@ var addZoneWeight = function(sum) {
 var calculateFloorCeiling = function(sum) {
 
 	return {
+		value : sum,
 		floor : sum * .9,
 		ceiling : sum * 1.1
 	};

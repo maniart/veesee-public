@@ -59,7 +59,7 @@ define([
                 },
                 initSlider : function() {
                     var self = this;
-                    console.warn('views : Evaluator.js >> Init Slider');
+                    //console.warn('views : Evaluator.js >> Init Slider');
                     var $slider = this.$el.find('.slider');
                     var config = {
                         value : self.model.get('sliderValue'),
@@ -77,15 +77,10 @@ define([
                     $slider.slider(config);
                 },
                 
-                setSliderValue : function(data) {
-                    
-                    console.warn('views : Evaluator.js >> setSliderValue'); 
-                
-                },
                 
                 initialize : function() {
 
-                    console.warn('views : Evaluator.js >> collection' , this.model.collection);
+                    //console.warn('views : Evaluator.js >> collection' , this.model.collection);
                     this.render();
                     this.initSlider();
                     
@@ -93,7 +88,7 @@ define([
                 },
                 render : function() {
                     this.$el.html(this.template({ model : this.model.toJSON() }));
-                    console.warn('views : Evaluator.js >> render');
+                    //console.warn('views : Evaluator.js >> render');
                     return this;
                 }
 
@@ -117,11 +112,11 @@ define([
                     var self = this;
                     switch(self.currentChildViewIndex) {
                         case self.childViews.length - 1:
-                            console.log('there is no next');
+                            //console.log('there is no next');
                             return;
                         case self.childViews.length - 2:
-                            console.log('last slide');
-                            self.trigger('evaluators:steps:last');
+                            //console.log('last slide');
+                            self.trigger('evaluators:calculateBtn:show');
                             this.getCurrentChildView().conceal(function() {
                                 self.currentChildViewIndex ++;    
                             });
@@ -138,13 +133,14 @@ define([
                 prev : function() {
                     var self = this;
                     if(self.currentChildViewIndex === 0) { 
-                        console.log('there is no prev');
+                        //console.log('there is no prev');
                         return; 
                     }
                     this.getCurrentChildView().conceal(function() {
                         self.currentChildViewIndex --;
                     });
                     this.getCurrentChildView().reveal();
+                    self.trigger('evaluators:calculateBtn:hide')
                 },
                 showCalculateBtn : function() {
                     $('.calculate').removeClass('hidden');
@@ -152,11 +148,13 @@ define([
                 },
                 attachListeners : function() {
                     var self = this;
-                    this.on('evaluators:steps:last', function(event) {
-                        //debugger;
-                        console.warn('yo');
+                    this.on('evaluators:calculateBtn:show', function(event) {
                         this.showCalculateBtn();
                     });
+                    this.on('evaluators:calculateBtn:hide', function(event) {
+                        this.showCalculateBtn();
+                    });
+
                 },
                 initialize : function() {
                     var self = this;
@@ -177,7 +175,7 @@ define([
                     
                         evaluatorView = new views.Evaluator({ model : evaluatorModel });
                         self.childViews.push(evaluatorView);
-                        console.warn('___________________________ ', self.childViews);
+                        //console.warn('___________________________ ', self.childViews);
                         self.$el.find('.evaluators').append(evaluatorView.el);                       
                         
                     });
@@ -188,7 +186,7 @@ define([
                 },
                 render : function() {
                     this.$el.html(this.template({}));
-                    console.log('views.js - this.collection: ', this);
+                    //console.log('views.js - this.collection: ', this);
                     var self = this;
                     this.collection.each(function(evaluatorModel) {
                         var evaluatorView = new views.Evaluator({ model : evaluatorModel });
@@ -213,7 +211,7 @@ define([
                     },
                     'click .calculate' : function(event) {
                         event.preventDefault();
-                        console.log('calculate clicked  ');
+                        //console.log('calculate clicked  ');
                         this.childViews[0].model.collection.save();
 
 

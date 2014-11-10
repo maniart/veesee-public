@@ -20,7 +20,7 @@ define([
 				Backbone.sync('create', this, {
 					success : function(response, status, jqXHR) {
 						if(jqXHR.status === 200) {
-							console.log('Response success: ', jqXHR);
+							//console.log('Response success: ', jqXHR);
 							alert(jqXHR.responseText);
 
 						} else {

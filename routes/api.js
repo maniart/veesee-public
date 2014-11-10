@@ -15,8 +15,6 @@ router.get('/', function(req, res) {
 });
 
 router.post('/', addResult, function(req, res, next) {
-	//console.log('received post request. Calculation result: ', calculator.calculate(req.body));
-	console.log('____________ &&&&&&&&&&&&&&&& _______________ result: ', req.result);
 	res.json(req.result);
 });	
 
