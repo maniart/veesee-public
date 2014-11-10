@@ -96,18 +96,18 @@ var defineBucketCode = function(categories) {
 			}
 		);
 	});
+	//console.log('categories: ', categories);
 	return categories;
 };
 
 var sumAllCategories = function(categories) {
 
+	
 	return _.reduce(
 		categories, function(memo, category, index, list) {
 			return category.sum + memo;
 		}, 0
 	);
-
-	return sum;
 
 };
 
@@ -124,14 +124,13 @@ var addZoneWeight = function(sum) {
 
 	finalZoneCode = finalZoneCode.join('');
 	zoneWeight = zoneTable[finalZoneCode];
-
 	return sum * zoneWeight;
 	
 
 };
 
 var calculateFloorCeiling = function(sum) {
-
+	
 	return {
 		value : sum,
 		floor : sum * .9,
@@ -142,13 +141,20 @@ var calculateFloorCeiling = function(sum) {
 
 var format = function(input) {
 
+	var outOfRangeMessage = 'The model has been calibrated against companies with pre-money valuations between $1.2M and $7.1M. The model has not been calibrated for values outside of this range and will be unable to produce reliable pricing.';
+
 	if (typeof input === 'object') {
-		
+		if(input.sum < 1200000 || input.sum > 7100000) {
+			return outOfRangeMessage;
+		}
 		_.each(input, function(value, key) {
 			input[key] = numeral(value).format('($ 0.00 a)');
 		});
 		return input;
 	} else if(typeof input === 'number') {
+		if(input < 1200000 || input > 7100000) {
+			return outOfRangeMessage;
+		}
 		return numeral(value).format('($ 0.00 a)'); 
 	} else {
 		throw new TypeError('`format` method only accepts numbers and objects');
@@ -158,11 +164,11 @@ var format = function(input) {
 
 var calculate = function(collection) {			
 
-	console.log(
-		format(
-			calculateFloorCeiling(
-				addZoneWeight(
-					sumAllCategories(
+	return format(
+		calculateFloorCeiling(
+			addZoneWeight(
+				sumAllCategories(
+					addBucketWeight(
 						defineBucketCode(
 							defineBuckets(
 								calculateCategorySum(
@@ -173,23 +179,7 @@ var calculate = function(collection) {
 							)
 						)
 					)
-				)
-			)
-		)
-	);
-	return format(
-		calculateFloorCeiling(
-			addZoneWeight(
-				sumAllCategories(
-					defineBucketCode(
-						defineBuckets(
-							calculateCategorySum(
-								calculateCategoryFactors(
-									merge(collection)
-								)
-							)
-						)
-					)
+					
 				)
 			)
 		)

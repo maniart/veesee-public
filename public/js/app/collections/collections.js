@@ -5,10 +5,10 @@ define([
 	
 	"jquery",
 	"backbone",
-	"models/models", 
-	"init/DesktopInit"], 
+	"models/models"
+	], 
 	
-	function($, Backbone, models, DesktopInit) {
+	function($, Backbone, models) {
 
 	var collections = {
 		

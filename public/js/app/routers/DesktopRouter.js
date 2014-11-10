@@ -22,23 +22,14 @@ define([
             routes: {
 
                 // When there is no hash on the url, the home method is called
-                "" : "index",
+                "" : "home",
                 "app" : "app" 
 
             },
 
             home: function() {
 
-                this.model = new models.Home();
                 
-                this.collection.fetch({
-                    success : function(collection, response) {
-                        new views.Evaluators({ collection : collection });    
-                    },
-                    error : function() {
-                        console.error('DesktopRouter >> error while fetching for collection json data.');
-                    }
-                });
 
             },
 

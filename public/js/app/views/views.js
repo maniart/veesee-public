@@ -101,7 +101,7 @@ define([
                 template : _.template(groupTpl),
                 tagName : 'section', 
                 attributes : {
-                    'class' : 'evaluators-container'
+                    'class' : 'row evaluators-container'
                 },
                 childViews : [],
                 currentChildViewIndex : 0,
@@ -140,11 +140,13 @@ define([
                         self.currentChildViewIndex --;
                     });
                     this.getCurrentChildView().reveal();
-                    self.trigger('evaluators:calculateBtn:hide')
+                    self.trigger('evaluators:calculateBtn:hide');
                 },
                 showCalculateBtn : function() {
                     $('.calculate').removeClass('hidden');
-
+                },
+                hideCalculateBtn : function() {
+                    $('.calculate').addClass('hidden');
                 },
                 attachListeners : function() {
                     var self = this;
@@ -152,7 +154,7 @@ define([
                         this.showCalculateBtn();
                     });
                     this.on('evaluators:calculateBtn:hide', function(event) {
-                        this.showCalculateBtn();
+                        this.hideCalculateBtn();
                     });
 
                 },
