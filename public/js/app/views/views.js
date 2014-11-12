@@ -10,9 +10,10 @@ define([
     "models/models", 
     "collections/collections",
     "text!templates/evaluator.html",
-    "text!templates/evaluators.html"], 
+    "text!templates/evaluators.html",
+    "text!templates/results.html"], 
     
-    function($, Backbone, models, collections, singleTpl, groupTpl){
+    function($, Backbone, models, collections, singleTpl, groupTpl, resultsTpl){
 
         var views = {
 
@@ -156,7 +157,10 @@ define([
                     this.on('evaluators:calculateBtn:hide', function(event) {
                         this.hideCalculateBtn();
                     });
-
+                    this.collection.on('save', function(evaluatorModel) {
+                        console.warn('save: ', evaluatorModel);
+                        new views.Results({ model : evaluatorModel })
+                    });
                 },
                 initialize : function() {
                     var self = this;
@@ -165,9 +169,6 @@ define([
                     this.populateChildViews(function() {
                         self.getCurrentChildView().reveal();    
                     });
-
-                    
-                    
                 },
                 populateChildViews : function(cb) {
                     var self = this,
@@ -177,7 +178,6 @@ define([
                     
                         evaluatorView = new views.Evaluator({ model : evaluatorModel });
                         self.childViews.push(evaluatorView);
-                        //console.warn('___________________________ ', self.childViews);
                         self.$el.find('.evaluators').append(evaluatorView.el);                       
                         
                     });
@@ -223,13 +223,31 @@ define([
                 }
 
 
+            }),
+    
+            Results : Backbone.View.extend({
+
+                template : _.template(resultsTpl),
+                tagName : 'section', 
+                $container : $('.app-container'),
+                attributes : {
+                    'class' : 'row evaluation-results'
+                },
+                render : function() {
+                    this.$el.html(this.template({ model : this.model.toJSON() }));
+                    this.$container.html('').append(this.$el);
+                },
+                initialize : function() {
+                    console.warn('results view initialized.');
+                }  
+            
             })
 
 
 
         };
 
-        
+        //debugger;
         return views;
 
 });

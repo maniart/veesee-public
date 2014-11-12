@@ -44,6 +44,17 @@ define([
                 'message' : 'Welcome to VeeSee'
             }
 
+        }),
+
+        Results : Backbone.Model.extend({
+
+            initialize : function() {
+                console.warn('Results page model');
+            },
+            defaults : {
+                'foo' : 'bar'
+            }
+
         })
 
     };

@@ -5,39 +5,43 @@ define([
 	
 	"jquery",
 	"backbone",
+	"views/views",
 	"models/models"
 	], 
 	
-	function($, Backbone, models) {
-
-	var collections = {
+	function($, Backbone, views, models) {
+		//debugger;
+		var collections = {
 		
-		Evaluators : Backbone.Collection.extend({
-		
-			model : models.Evaluator,
-			url : '/api',
-			save : function() {
-				Backbone.sync('create', this, {
-					success : function(response, status, jqXHR) {
-						if(jqXHR.status === 200) {
-							//console.log('Response success: ', jqXHR);
-							alert(jqXHR.responseText);
+			Evaluators : Backbone.Collection.extend({
+				_this : this,
+				model : models.Evaluator,
+				url : '/api',
+				save : function() {
+					//debugger;
+					var self = this;
+					Backbone.sync('create', this, {
+						success : function(response, status, jqXHR) {
+							if(jqXHR.status === 200) {
+								self.trigger('save', 
+									{ resultsModel : new models.Results(jqXHR.responseText) }
+								);
 
-						} else {
-							console.error('something went wrong?');
+							} else {
+								console.error('something went wrong?');
+							}
+							
+						},
+						error : function(err) {
+							console.warn('****** collection failed to save.');
 						}
-						
-					},
-					error : function(err) {
-						console.warn('****** collection failed to save.');
-					}
-				});
-				
-			}
+					});
+					
+				}
 			
-		})
+			})
 	
-	};
+		};
     
     return collections;
 
