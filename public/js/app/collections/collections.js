@@ -23,8 +23,9 @@ define([
 					Backbone.sync('create', this, {
 						success : function(response, status, jqXHR) {
 							if(jqXHR.status === 200) {
+								
 								self.trigger('save', 
-									{ resultsModel : new models.Results(jqXHR.responseText) }
+									{ resultsModel : new models.Results(JSON.parse(jqXHR.responseText)) }
 								);
 
 							} else {

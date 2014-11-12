@@ -77,7 +77,9 @@ define([
                     };
                     $slider.slider(config);
                 },
-                
+                attachListeners : function() {
+
+                },
                 
                 initialize : function() {
 
@@ -157,9 +159,11 @@ define([
                     this.on('evaluators:calculateBtn:hide', function(event) {
                         this.hideCalculateBtn();
                     });
-                    this.collection.on('save', function(evaluatorModel) {
-                        console.warn('save: ', evaluatorModel);
-                        new views.Results({ model : evaluatorModel })
+                    this.collection.on('save', function(event) {
+                        self.$el.fadeOut(300, function() {
+                            new views.Results({ model : event.resultsModel });    
+                        });
+                        
                     });
                 },
                 initialize : function() {
@@ -213,10 +217,7 @@ define([
                     },
                     'click .calculate' : function(event) {
                         event.preventDefault();
-                        //console.log('calculate clicked  ');
                         this.childViews[0].model.collection.save();
-
-
 
                     }
                     
@@ -238,6 +239,7 @@ define([
                     this.$container.html('').append(this.$el);
                 },
                 initialize : function() {
+                    this.render();
                     console.warn('results view initialized.');
                 }  
             

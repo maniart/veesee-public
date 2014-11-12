@@ -4,6 +4,7 @@ var numeral = require('numeral');
 var categories = require('../reference/categories.json');
 var buckets = require('../reference/buckets.json');
 var zoneTable = require('../reference/zonetable.json');
+var categories;
 
 var merge = function(collection) {
 	
@@ -96,6 +97,8 @@ var defineBucketCode = function(categories) {
 			}
 		);
 	});
+	//temp
+	categories = categories;
 	//console.log('categories: ', categories);
 	return categories;
 };
@@ -184,6 +187,8 @@ var calculate = function(collection) {
 			)
 		)
 	);
+	
+
 	
 };
 
