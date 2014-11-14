@@ -4,7 +4,6 @@ var numeral = require('numeral');
 var categories = require('../reference/categories.json');
 var buckets = require('../reference/buckets.json');
 var zoneTable = require('../reference/zonetable.json');
-var categories;
 
 var merge = function(collection) {
 	
@@ -35,9 +34,9 @@ var calculateCategoryFactors = function(categories) {
 					return weightedValue + memo;
 				}, 0
 			) 
-		})
+		});
 	});
-
+	
 	return categories;
 
 };
@@ -97,9 +96,6 @@ var defineBucketCode = function(categories) {
 			}
 		);
 	});
-	//temp
-	categories = categories;
-	//console.log('categories: ', categories);
 	return categories;
 };
 
@@ -150,15 +146,16 @@ var format = function(input) {
 		if(input.sum < 1200000 || input.sum > 7100000) {
 			return outOfRangeMessage;
 		}
-		_.each(input, function(value, key) {
-			input[key] = numeral(value).format('($ 0.00 a)');
+		return _.map(input, function(value, key) {
+			return value = numeral(value).format('($ 0.00 a)');
 		});
-		return input;
+		//return input;
 	} else if(typeof input === 'number') {
 		if(input < 1200000 || input > 7100000) {
 			return outOfRangeMessage;
 		}
-		return numeral(value).format('($ 0.00 a)'); 
+		var result = numeral(input).format('($ 0.00 a)'); 
+		return result; 
 	} else {
 		throw new TypeError('`format` method only accepts numbers and objects');
 	}
@@ -167,26 +164,52 @@ var format = function(input) {
 
 var calculate = function(collection) {			
 
-	return format(
-		calculateFloorCeiling(
-			addZoneWeight(
-				sumAllCategories(
-					addBucketWeight(
-						defineBucketCode(
-							defineBuckets(
-								calculateCategorySum(
-									calculateCategoryFactors(
-										merge(collection)
-									)
+	var valuationRaw = calculateFloorCeiling(
+		addZoneWeight(
+			sumAllCategories(
+				addBucketWeight(
+					defineBucketCode(
+						defineBuckets(
+							calculateCategorySum(
+								calculateCategoryFactors(
+									merge(collection)
 								)
 							)
 						)
 					)
-					
 				)
+				
 			)
 		)
 	);
+	
+	console.log('___ raw: ', valuationRaw);
+
+	var valuationFormatted = format(valuationRaw);
+	
+	var factors = _.map(categories, function(category) {
+		return {
+			title : category.title,
+			factor : category.factor
+		};
+	});
+	
+	console.log({
+		valuation : {
+			raw : valuationRaw,
+			formatted : valuationFormatted
+		},
+		factors : factors
+	});
+	
+	return {
+		valuation : {
+			raw : valuationRaw,
+			formatted : valuationFormatted
+		},
+		factors : factors
+	};
+
 	
 
 	
