@@ -3,4 +3,17 @@
 		Valuation:
 	</h1>
 	<h3 style="text-align:center;"><%= model.valuation.formatted.floor %> - <%= model.valuation.formatted.ceiling %></h3>
+	<div class="row">
+		<% _.each(model.factors, function(factor) { %>
+			<div class="col-xs-6">
+				<div class="progress">
+			 		<div class="progress-bar <%= factor.title %>" role="progressbar" aria-valuenow="<%= factor.factor * 100 %>" aria-valuemin="0" aria-valuemax="100" style="width: <%= factor.factor * 100 %>%">
+			   		<%= factor.title %> - <%= factor.factor * 100 %>%
+			   		</div>
+				</div>	
+			</div>
+			
+		<% }); %>
+	</div>
+	
 </div>
