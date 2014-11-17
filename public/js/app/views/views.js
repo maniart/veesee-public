@@ -161,6 +161,7 @@ define([
                     });
                     this.collection.on('save', function(event) {
                         self.$el.fadeOut(300, function() {
+                            console.warn('creating the results view, mode: ', event.resultsModel);
                             new views.Results({ model : event.resultsModel });    
                         });
                         

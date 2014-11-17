@@ -50,10 +50,8 @@ define([
 
             initialize : function() {
                 console.warn('Results page model');
-            },
-            defaults : {
-                'foo' : 'bar'
             }
+            
 
         })
 

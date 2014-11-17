@@ -146,10 +146,10 @@ var format = function(input) {
 		if(input.sum < 1200000 || input.sum > 7100000) {
 			return outOfRangeMessage;
 		}
-		return _.map(input, function(value, key) {
-			return value = numeral(value).format('($ 0.00 a)');
+		return _.each(_.clone(input), function(value, key, list) {
+			list[key] = numeral(value).format('($ 0.00 a)'); 
 		});
-		//return input;
+		
 	} else if(typeof input === 'number') {
 		if(input < 1200000 || input > 7100000) {
 			return outOfRangeMessage;
@@ -164,7 +164,11 @@ var format = function(input) {
 
 var calculate = function(collection) {			
 
-	var valuationRaw = calculateFloorCeiling(
+	var valuationRaw,
+		valuationFormatted,
+		factors;
+
+	valuationRaw = calculateFloorCeiling(
 		addZoneWeight(
 			sumAllCategories(
 				addBucketWeight(
@@ -183,11 +187,9 @@ var calculate = function(collection) {
 		)
 	);
 	
-	console.log('___ raw: ', valuationRaw);
-
-	var valuationFormatted = format(valuationRaw);
+	valuationFormatted = format(valuationRaw);
 	
-	var factors = _.map(categories, function(category) {
+	factors = _.map(categories, function(category) {
 		return {
 			title : category.title,
 			factor : category.factor
@@ -201,7 +203,7 @@ var calculate = function(collection) {
 		},
 		factors : factors
 	});
-	
+
 	return {
 		valuation : {
 			raw : valuationRaw,
@@ -209,9 +211,6 @@ var calculate = function(collection) {
 		},
 		factors : factors
 	};
-
-	
-
 	
 };
 
