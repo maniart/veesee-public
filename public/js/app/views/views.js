@@ -11,9 +11,10 @@ define([
     "collections/collections",
     "text!templates/evaluator.html",
     "text!templates/evaluators.html",
-    "text!templates/results.html"], 
+    "text!templates/results.html",
+    "text!templates/home.html"], 
     
-    function($, Backbone, models, collections, singleTpl, groupTpl, resultsTpl){
+    function($, Backbone, models, collections, singleTpl, groupTpl, resultsTpl, homeTpl){
 
         var views = {
 
@@ -164,6 +165,7 @@ define([
                             console.warn('creating the results view, mode: ', event.resultsModel);
                             new views.Results({ model : event.resultsModel });    
                         });
+
                         
                     });
                 },
@@ -193,6 +195,7 @@ define([
                     }    
                 },
                 render : function() {
+                    this.$container.html('');
                     this.$el.html(this.template({}));
                     //console.log('views.js - this.collection: ', this);
                     var self = this;
@@ -245,6 +248,24 @@ define([
                     console.warn('results view initialized.');
                 }  
             
+            }),
+
+            Home : Backbone.View.extend({
+                $container : $('.app-container'),
+                template : _.template(homeTpl),
+                tagName : 'section',
+                attributes : {
+                    'class' : 'row home'
+                },
+                render : function() {
+                    this.$el.html(this.template({}));
+                    this.$container.html('').append(this.$el);
+                },
+                initialize : function(){
+                    console.warn('home view');
+                    this.render();
+                }
+
             })
 
 

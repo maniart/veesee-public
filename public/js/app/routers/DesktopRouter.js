@@ -29,7 +29,7 @@ define([
 
             home: function() {
 
-                
+                new views.Home();
 
             },
 

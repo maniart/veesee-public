@@ -25,6 +25,8 @@ require.config({
       // -------
       "backbone.validateAll": "../libs/plugins/Backbone.validateAll",
 
+      "localStorage" : "../libs/plugins/backbone.localStorage",
+
       "bootstrap": "../libs/plugins/bootstrap",
 
       "text": "../libs/plugins/text",
@@ -47,6 +49,8 @@ require.config({
 
       // Backbone.validateAll plugin that depends on Backbone
       "backbone.validateAll": ["backbone"],
+
+      "localStorage" : ["backbone"],
 
       // Jasmine-jQuery plugin
       "jasminejquery": ["jquery"]
