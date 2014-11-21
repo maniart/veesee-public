@@ -33,6 +33,11 @@ define([
 
 
         }),
+        Evaluators : Backbone.Model.extend({
+            initialize : function() {
+                console.log('Evaluators Model init');
+            }
+        }),
 
         Home : Backbone.Model.extend({
 

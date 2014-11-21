@@ -10,11 +10,9 @@ define([
 	], 
 	
 	function($, Backbone, views, models) {
-		//debugger;
 		var collections = {
 		
 			Evaluators : Backbone.Collection.extend({
-				_this : this,
 				model : models.Evaluator,
 				url : '/api',
 				save : function() {
@@ -23,7 +21,6 @@ define([
 					Backbone.sync('create', this, {
 						success : function(response, status, jqXHR) {
 							if(jqXHR.status === 200) {
-								
 								self.trigger('save', 
 									{ resultsModel : new models.Results(JSON.parse(jqXHR.responseText)) }
 								);

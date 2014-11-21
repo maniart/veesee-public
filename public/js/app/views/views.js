@@ -91,7 +91,7 @@ define([
                 },
                 render : function() {
                     this.$el.html(this.template({ model : this.model.toJSON() }));
-                    //console.warn('views : Evaluator.js >> render');
+                    console.warn('model is: ', this.model);
                     return this;
                 }
 
@@ -174,6 +174,7 @@ define([
                     this.populateChildViews(function() {
                         self.getCurrentChildView().reveal();    
                     });
+                    console.warn('>>>> my collection is: ', this.collection);
                 },
                 populateChildViews : function(cb) {
                     var self = this,
