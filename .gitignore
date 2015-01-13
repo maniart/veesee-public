@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 .idea
 node_modules/
 coverage/
@@ -30,7 +29,7 @@ build/Release
 # Commenting this out is preferred by some people, see
 # https://www.npmjs.org/doc/misc/npm-faq.html#should-i-check-my-node_modules-folder-into-git-
 node_modules
+public/bower_components
 
 # Users Environment Variables
 .lock-wscript
->>>>>>> 42e394ec52ade1480398b6583c350e34de2f8b1c
