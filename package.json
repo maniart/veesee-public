@@ -40,7 +40,6 @@
   },
   "dependencies": {
     "body-parser": "^1.9.0",
-    "bootstrap": "^3.3.1",
     "debug": "^2.1.0",
     "express": "^4.9.8",
     "morgan": "^1.5.0",
@@ -52,11 +51,13 @@
   },
   "browser": {
     "jquery": "./public/bower_components/jquery/jquery.js",
-    "modernizr": "./public/bower_components/modernizr/modernizr.js"
+    "modernizr": "./public/bower_components/modernizr/modernizr.js",
+    "underscore": "./public/bower_components/underscore/underscore.js"
   },
   "browserify-shim": {
     "jquery": "$",
-    "modernizr": "Modernizr"
+    "modernizr": "Modernizr",
+    "underscore": "underscore"
   },
   "browserify": {
     "transform": [

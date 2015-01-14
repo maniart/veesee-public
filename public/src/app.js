@@ -1,3 +1,4 @@
-var $ = require('jquery');
-console.log('hello world');
-$(document).ready(function() { alert('yo'); });
+var _ = require('underscore');
+_.each([1,2,3], function(num){
+	console.log('num is', num);
+});

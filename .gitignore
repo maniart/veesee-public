@@ -3,7 +3,8 @@ node_modules/
 coverage/
 reports/
 public/reports/
-=======
+Designs/
+
 # Logs
 logs
 *.log
