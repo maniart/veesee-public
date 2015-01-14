@@ -34,6 +34,7 @@
     "grunt-contrib-less": "^0.11.4",
     "grunt-contrib-uglify": "^0.3.3",
     "grunt-contrib-watch": "^0.6.1",
+    "grunt-watchify": "^0.1.0",
     "morgan": "^1.4.0",
     "uglify-js": "~2.2.0",
     "webdriverjs": "~0.7.9"
@@ -56,8 +57,7 @@
   },
   "browserify-shim": {
     "jquery": "$",
-    "modernizr": "Modernizr",
-    "underscore": "underscore"
+    "modernizr": "Modernizr"
   },
   "browserify": {
     "transform": [

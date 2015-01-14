@@ -15,9 +15,66 @@ module.exports = function(grunt) {
             }
         },
 
+        
         browserify: {
             dist: {
-                files: { 'public/build/app.js': ['public/src/app.js'] }
+                files: { 'public/js/build/app.js': ['public/js/src/app.js'] }
+            }, 
+            options: {
+                //transform: ['browserify-shim'],
+                //watch: true
+            }
+        },
+        
+
+        // watchify: {
+        //     options: {
+        //         // defaults options used in b.bundle(opts)
+        //         detectGlobals: true,
+        //         insertGlobals: false,
+        //         ignoreMissing: false,
+        //         debug: false,
+        //         standalone: false,
+        //         keepalive: false,
+        //         callback: function(b) {
+        //             // configure the browserify instance here
+        //             b.add();
+        //             b.require();
+        //             b.external();
+        //             b.ignore();
+        //             b.transform();
+
+        //             // return it
+        //             return b;
+        //         }
+                
+        //     },
+        //     app: {
+        //         src: './public/js/src/app.js',
+        //         dest: './public/js/build/app.js'
+        //     }
+        // },
+        
+        less: {
+            development: {
+                options: {
+                    compress: true,
+                    yuicompress: true,
+                    optimization: 2
+                },
+                files: {
+                    "public/css/build/main.min.css": "public/css/src/main.less"
+                }
+            }
+        },
+
+        watch: {
+            styles: {
+                files: ['public/**/*.less'], 
+                tasks: ['less'],
+                options: {
+                    nospawn: true
+                }
             }
         },
     
@@ -29,7 +86,7 @@ module.exports = function(grunt) {
             },
             my_target: {
                 files: {
-                    'public/build/app.min.js': ['public/build/app.js']
+                    'public/js/build/app.min.js': ['public/js/build/app.js']
                 }
             }
         }
@@ -38,10 +95,12 @@ module.exports = function(grunt) {
 
     grunt.loadNpmTasks('grunt-contrib-less');
     grunt.loadNpmTasks('grunt-contrib-watch');
-    grunt.loadNpmTasks('grunt-contrib-jshint');
+    //grunt.loadNpmTasks('grunt-contrib-jshint');
     grunt.loadNpmTasks('grunt-bower-task');
     grunt.loadNpmTasks('grunt-browserify');
+    //grunt.loadNpmTasks('grunt-watchify');
     grunt.loadNpmTasks('grunt-contrib-uglify');
 
-    grunt.registerTask('default', ['browserify', 'uglify']);
+    grunt.registerTask('default', ['browserify', 'watch']);
+
 };
