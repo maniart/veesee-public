@@ -8,6 +8,7 @@ var fs = require('fs');
 var debug = require('debug')('veesee');
 var api = require('./routes/api');
 var home = require('./routes/home');
+var login = require('./routes/login');
 
 var app = express();
 
@@ -22,6 +23,7 @@ app.use(bodyParser.urlencoded({
 app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/', home);
+app.use('/login', login);
 app.use('/api', api);
 
 
@@ -74,29 +76,6 @@ if (app.get('env') === 'development') {
         });
     });
 }
-
-var onExit = function() {
-    if(app.get('env') === 'production') {
-        try {
-            fs.unlink('/var/run/pmfat.pid', function() {
-                console.log('>> app.js : removed /var/run/pmfat.pid before exit');
-            });
-        } catch(e) {
-            console.log('>> app.js : fs error while trying to remove /var/run/pmfat.pid before exit : ', e);
-        }    
-    }
-    console.log('>> app.js : Sorry to see you go. Run me again soon.');
-    
-};
-
-// remove /var/run/pmfat.pid file on production, before exit
-/*TODO: fix this for launch  */
-
-//process.on('exit', onExit);
-//process.on('uncaughtException', onExit);
-//process.on('SIGTERM', onExit);
-//process.on('SIGINT', onExit);
-
 
 // production error handler
 // no stacktraces leaked to user
