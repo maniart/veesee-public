@@ -1,5 +1,157 @@
 @import "../vendor/lesshat";
 
+// vars
+@color-red: rgb(253, 94, 99);
+
+// global styles
+html, body {
+	height: 100%;
+	margin: 0px;
+	padding: 0px;
+}
+html {
+  box-sizing: border-box;
+}
+*, *:before, *:after {
+  box-sizing: inherit;
+}
+
+// global components
+.full-height {
+	min-height: 100%;
+}
+.middle-align {
+	position: absolute;
+  	top: 50%;
+  	transform: translateY(-50%);	
+}
+.global-header {
+	.navbar {
+		background: rgba(255,255,255,.8);
+		min-height: 100px;
+	} 
+	.global-nav {
+		ul {
+			margin-top: 35px;
+		}
+		li {
+			margin-left: 10px;
+		}
+		a {
+			color: @color-red;
+			font-family: bebas_neuebook;
+			font-size: 1.4em;
+			padding-top: 10px;
+			padding-bottom: 10px;
+		}
+		.highlight {
+			.border-radius(3px);
+			color: white;
+			background-color: @color-red;
+		}
+	}
+}
+.global-footer {
+	&.bottom {
+		position: absolute;
+		bottom: 0;
+	}
+	color: rgba(200,200,200,1);
+	font-family: bitterregular;
+	margin: 15px 0;
+	font-size: .7em;
+	letter-spacing: 1px;
+}
+h1, h2, h3 {
+	font-family: bitterbold;
+}
+.underline {
+	border-bottom: 2px solid @color-red;
+}
+.red {
+	color: @color-red;
+}
+
+// home page
+.above-fold {
+	padding-top: 80px;
+}
+.below-fold {
+	position: relative;
+	.intro-text {
+		margin-top: 60px;
+	}
+}
+.first-title,
+.tagline {
+	color: white;
+	display: inline-block;
+	float: left;
+	clear: both;
+}
+.first-title {
+	line-height: .8;
+	font-size: 6em;
+	border-bottom: 3px solid white;
+}
+.tagline {
+	font-family: bitterregular;
+	margin: 0;
+	letter-spacing: 5px;
+	font-size: 2.9em;
+	line-height: .7;
+}
+.play-movie {
+	display: inline-block;
+	float: left;
+	clear: both;	
+	margin-top: 40px;
+	font-size: 2.5em;
+	letter-spacing: 1px;
+	font-family: bebas_neuebook;
+	text-transform: uppercase;
+	color: white;
+}
+.movie-screenshot {
+	position: absolute;
+	width: 100%;
+	background: url('../../img/movie-screenshot.png') 0 0 no-repeat;
+	background-size: cover;
+	z-index: -1;
+}
+.inner {
+	background: #ccc;
+}
+h3.copy {
+	color: @color-red;
+	//border-bottom: 2px solid @color-red;
+	text-decoration: underline;
+	font-size: 2em;
+	display: inline-block;
+	clear: both;
+	float: left;
+	font-family: bitterregular;
+	line-height: 1.2;
+	margin: 0;
+	&.em {
+		font-family: bitterbold_italic;
+	}
+	&.push-down {
+		margin-bottom: 15px;
+	}
+}
+.intro-text {
+	h4 {
+		color: @color-red;
+		font-family: bebas_neuelight;
+		font-size: 1.8em;
+	}
+	p {
+		font-family: bitterregular;
+	}
+}
+
+
 .noselect() {
     -webkit-touch-callout: none;
     -webkit-user-select: none;
@@ -12,7 +164,7 @@
 
 body {
 	.noselect();
-	background: yellow;
+	background: white;
 	color: black;	
 	font-size: 16px;
 	font-family: "Helvetica Neue", "Helvetica", Helvetica, Arial, sans-serif;
