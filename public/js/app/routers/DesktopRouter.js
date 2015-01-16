@@ -1,5 +1,11 @@
 // DesktopRouter.js
 // ----------------
+var $ = require('jquery');
+var Backbone = require('Backbone');
+var models = require('../models/models');
+var views = require('../views/views');
+var collections = require('../collections/collections');
+
 define([
     "jquery", 
     "backbone", 
