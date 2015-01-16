@@ -10,16 +10,22 @@ Backbone.$ = window.$;
 var Router = Backbone.Router.extend({
 
     initialize: function() {
-        Backbone.history.start();
+        Backbone.history.start({
+            pushState: false
+        });
     },
     
     routes: {
-        "" : "home",
+        "" : "static",
         "app" : "app" 
     },
 
-    home: function() {
-        new views.Home();
+    static: function() {
+        // only render home if path does not inclue `/login`
+        var pathname = window.location.pathname;
+        if(!pathname.match(/login/g)) {
+            new views.Home();
+        }       
     },
 
     app : function() {

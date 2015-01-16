@@ -11,11 +11,12 @@ var ieee754 = require('ieee754')
 var isArray = require('is-array')
 
 exports.Buffer = Buffer
-exports.SlowBuffer = Buffer
+exports.SlowBuffer = SlowBuffer
 exports.INSPECT_MAX_BYTES = 50
 Buffer.poolSize = 8192 // not used by this implementation
 
 var kMaxLength = 0x3fffffff
+var rootParent = {}
 
 /**
  * If `Buffer.TYPED_ARRAY_SUPPORT`:
@@ -75,8 +76,6 @@ function Buffer (subject, encoding, noZero) {
   if (type === 'number')
     length = subject > 0 ? subject >>> 0 : 0
   else if (type === 'string') {
-    if (encoding === 'base64')
-      subject = base64clean(subject)
     length = Buffer.byteLength(subject, encoding)
   } else if (type === 'object' && subject !== null) { // assume object is array-like
     if (subject.type === 'Buffer' && isArray(subject.data))
@@ -85,7 +84,7 @@ function Buffer (subject, encoding, noZero) {
   } else
     throw new TypeError('must start with number, buffer, array or string')
 
-  if (this.length > kMaxLength)
+  if (length > kMaxLength)
     throw new RangeError('Attempt to allocate Buffer larger than maximum ' +
       'size: 0x' + kMaxLength.toString(16) + ' bytes')
 
@@ -121,6 +120,18 @@ function Buffer (subject, encoding, noZero) {
     }
   }
 
+  if (length > 0 && length <= Buffer.poolSize)
+    buf.parent = rootParent
+
+  return buf
+}
+
+function SlowBuffer(subject, encoding, noZero) {
+  if (!(this instanceof SlowBuffer))
+    return new SlowBuffer(subject, encoding, noZero)
+
+  var buf = new Buffer(subject, encoding, noZero)
+  delete buf.parent
   return buf
 }
 
@@ -271,7 +282,7 @@ Buffer.prototype.toString = function (encoding, start, end) {
 }
 
 Buffer.prototype.equals = function (b) {
-  if(!Buffer.isBuffer(b)) throw new TypeError('Argument must be a Buffer')
+  if (!Buffer.isBuffer(b)) throw new TypeError('Argument must be a Buffer')
   return Buffer.compare(this, b) === 0
 }
 
@@ -331,7 +342,7 @@ function hexWrite (buf, string, offset, length) {
 }
 
 function utf8Write (buf, string, offset, length) {
-  var charsWritten = blitBuffer(utf8ToBytes(string), buf, offset, length)
+  var charsWritten = blitBuffer(utf8ToBytes(string, buf.length - offset), buf, offset, length)
   return charsWritten
 }
 
@@ -350,7 +361,7 @@ function base64Write (buf, string, offset, length) {
 }
 
 function utf16leWrite (buf, string, offset, length) {
-  var charsWritten = blitBuffer(utf16leToBytes(string), buf, offset, length, 2)
+  var charsWritten = blitBuffer(utf16leToBytes(string, buf.length - offset), buf, offset, length, 2)
   return charsWritten
 }
 
@@ -370,6 +381,10 @@ Buffer.prototype.write = function (string, offset, length, encoding) {
   }
 
   offset = Number(offset) || 0
+
+  if (length < 0 || offset < 0 || offset > this.length)
+    throw new RangeError('attempt to write outside buffer bounds');
+
   var remaining = this.length - offset
   if (!length) {
     length = remaining
@@ -448,13 +463,19 @@ function asciiSlice (buf, start, end) {
   end = Math.min(buf.length, end)
 
   for (var i = start; i < end; i++) {
-    ret += String.fromCharCode(buf[i])
+    ret += String.fromCharCode(buf[i] & 0x7F)
   }
   return ret
 }
 
 function binarySlice (buf, start, end) {
-  return asciiSlice(buf, start, end)
+  var ret = ''
+  end = Math.min(buf.length, end)
+
+  for (var i = start; i < end; i++) {
+    ret += String.fromCharCode(buf[i])
+  }
+  return ret
 }
 
 function hexSlice (buf, start, end) {
@@ -503,16 +524,21 @@ Buffer.prototype.slice = function (start, end) {
   if (end < start)
     end = start
 
+  var newBuf
   if (Buffer.TYPED_ARRAY_SUPPORT) {
-    return Buffer._augment(this.subarray(start, end))
+    newBuf = Buffer._augment(this.subarray(start, end))
   } else {
     var sliceLen = end - start
-    var newBuf = new Buffer(sliceLen, undefined, true)
+    newBuf = new Buffer(sliceLen, undefined, true)
     for (var i = 0; i < sliceLen; i++) {
       newBuf[i] = this[i + start]
     }
-    return newBuf
   }
+
+  if (newBuf.length)
+    newBuf.parent = this.parent || this
+
+  return newBuf
 }
 
 /*
@@ -523,6 +549,35 @@ function checkOffset (offset, ext, length) {
     throw new RangeError('offset is not uint')
   if (offset + ext > length)
     throw new RangeError('Trying to access beyond buffer length')
+}
+
+Buffer.prototype.readUIntLE = function (offset, byteLength, noAssert) {
+  offset = offset >>> 0
+  byteLength = byteLength >>> 0
+  if (!noAssert)
+    checkOffset(offset, byteLength, this.length)
+
+  var val = this[offset]
+  var mul = 1
+  var i = 0
+  while (++i < byteLength && (mul *= 0x100))
+    val += this[offset + i] * mul
+
+  return val
+}
+
+Buffer.prototype.readUIntBE = function (offset, byteLength, noAssert) {
+  offset = offset >>> 0
+  byteLength = byteLength >>> 0
+  if (!noAssert)
+    checkOffset(offset, byteLength, this.length)
+
+  var val = this[offset + --byteLength]
+  var mul = 1
+  while (byteLength > 0 && (mul *= 0x100))
+    val += this[offset + --byteLength] * mul;
+
+  return val
 }
 
 Buffer.prototype.readUInt8 = function (offset, noAssert) {
@@ -561,6 +616,44 @@ Buffer.prototype.readUInt32BE = function (offset, noAssert) {
       ((this[offset + 1] << 16) |
       (this[offset + 2] << 8) |
       this[offset + 3])
+}
+
+Buffer.prototype.readIntLE = function (offset, byteLength, noAssert) {
+  offset = offset >>> 0
+  byteLength = byteLength >>> 0
+  if (!noAssert)
+    checkOffset(offset, byteLength, this.length)
+
+  var val = this[offset]
+  var mul = 1
+  var i = 0
+  while (++i < byteLength && (mul *= 0x100))
+    val += this[offset + i] * mul
+  mul *= 0x80
+
+  if (val >= mul)
+    val -= Math.pow(2, 8 * byteLength)
+
+  return val
+}
+
+Buffer.prototype.readIntBE = function (offset, byteLength, noAssert) {
+  offset = offset >>> 0
+  byteLength = byteLength >>> 0
+  if (!noAssert)
+    checkOffset(offset, byteLength, this.length)
+
+  var i = byteLength
+  var mul = 1
+  var val = this[offset + --i]
+  while (i > 0 && (mul *= 0x100))
+    val += this[offset + --i] * mul
+  mul *= 0x80
+
+  if (val >= mul)
+    val -= Math.pow(2, 8 * byteLength)
+
+  return val
 }
 
 Buffer.prototype.readInt8 = function (offset, noAssert) {
@@ -631,8 +724,40 @@ Buffer.prototype.readDoubleBE = function (offset, noAssert) {
 
 function checkInt (buf, value, offset, ext, max, min) {
   if (!Buffer.isBuffer(buf)) throw new TypeError('buffer must be a Buffer instance')
-  if (value > max || value < min) throw new TypeError('value is out of bounds')
-  if (offset + ext > buf.length) throw new TypeError('index out of range')
+  if (value > max || value < min) throw new RangeError('value is out of bounds')
+  if (offset + ext > buf.length) throw new RangeError('index out of range')
+}
+
+Buffer.prototype.writeUIntLE = function (value, offset, byteLength, noAssert) {
+  value = +value
+  offset = offset >>> 0
+  byteLength = byteLength >>> 0
+  if (!noAssert)
+    checkInt(this, value, offset, byteLength, Math.pow(2, 8 * byteLength), 0)
+
+  var mul = 1
+  var i = 0
+  this[offset] = value & 0xFF
+  while (++i < byteLength && (mul *= 0x100))
+    this[offset + i] = (value / mul) >>> 0 & 0xFF
+
+  return offset + byteLength
+}
+
+Buffer.prototype.writeUIntBE = function (value, offset, byteLength, noAssert) {
+  value = +value
+  offset = offset >>> 0
+  byteLength = byteLength >>> 0
+  if (!noAssert)
+    checkInt(this, value, offset, byteLength, Math.pow(2, 8 * byteLength), 0)
+
+  var i = byteLength - 1
+  var mul = 1
+  this[offset + i] = value & 0xFF
+  while (--i >= 0 && (mul *= 0x100))
+    this[offset + i] = (value / mul) >>> 0 & 0xFF
+
+  return offset + byteLength
 }
 
 Buffer.prototype.writeUInt8 = function (value, offset, noAssert) {
@@ -712,6 +837,50 @@ Buffer.prototype.writeUInt32BE = function (value, offset, noAssert) {
   return offset + 4
 }
 
+Buffer.prototype.writeIntLE = function (value, offset, byteLength, noAssert) {
+  value = +value
+  offset = offset >>> 0
+  if (!noAssert) {
+    checkInt(this,
+             value,
+             offset,
+             byteLength,
+             Math.pow(2, 8 * byteLength - 1) - 1,
+             -Math.pow(2, 8 * byteLength - 1))
+  }
+
+  var i = 0
+  var mul = 1
+  var sub = value < 0 ? 1 : 0
+  this[offset] = value & 0xFF
+  while (++i < byteLength && (mul *= 0x100))
+    this[offset + i] = ((value / mul) >> 0) - sub & 0xFF
+
+  return offset + byteLength
+}
+
+Buffer.prototype.writeIntBE = function (value, offset, byteLength, noAssert) {
+  value = +value
+  offset = offset >>> 0
+  if (!noAssert) {
+    checkInt(this,
+             value,
+             offset,
+             byteLength,
+             Math.pow(2, 8 * byteLength - 1) - 1,
+             -Math.pow(2, 8 * byteLength - 1))
+  }
+
+  var i = byteLength - 1
+  var mul = 1
+  var sub = value < 0 ? 1 : 0
+  this[offset + i] = value & 0xFF
+  while (--i >= 0 && (mul *= 0x100))
+    this[offset + i] = ((value / mul) >> 0) - sub & 0xFF
+
+  return offset + byteLength
+}
+
 Buffer.prototype.writeInt8 = function (value, offset, noAssert) {
   value = +value
   offset = offset >>> 0
@@ -777,8 +946,9 @@ Buffer.prototype.writeInt32BE = function (value, offset, noAssert) {
 }
 
 function checkIEEE754 (buf, value, offset, ext, max, min) {
-  if (value > max || value < min) throw new TypeError('value is out of bounds')
-  if (offset + ext > buf.length) throw new TypeError('index out of range')
+  if (value > max || value < min) throw new RangeError('value is out of bounds')
+  if (offset + ext > buf.length) throw new RangeError('index out of range')
+  if (offset < 0) throw new RangeError('index out of range')
 }
 
 function writeFloat (buf, value, offset, littleEndian, noAssert) {
@@ -817,18 +987,19 @@ Buffer.prototype.copy = function (target, target_start, start, end) {
 
   if (!start) start = 0
   if (!end && end !== 0) end = this.length
+  if (target_start >= target.length) target_start = target.length
   if (!target_start) target_start = 0
+  if (end > 0 && end < start) end = start
 
   // Copy 0 bytes; we're done
-  if (end === start) return
-  if (target.length === 0 || source.length === 0) return
+  if (end === start) return 0
+  if (target.length === 0 || source.length === 0) return 0
 
   // Fatal error conditions
-  if (end < start) throw new TypeError('sourceEnd < sourceStart')
-  if (target_start < 0 || target_start >= target.length)
-    throw new TypeError('targetStart out of bounds')
-  if (start < 0 || start >= source.length) throw new TypeError('sourceStart out of bounds')
-  if (end < 0 || end > source.length) throw new TypeError('sourceEnd out of bounds')
+  if (target_start < 0)
+    throw new RangeError('targetStart out of bounds')
+  if (start < 0 || start >= source.length) throw new RangeError('sourceStart out of bounds')
+  if (end < 0) throw new RangeError('sourceEnd out of bounds')
 
   // Are we oob?
   if (end > this.length)
@@ -845,6 +1016,8 @@ Buffer.prototype.copy = function (target, target_start, start, end) {
   } else {
     target._set(this.subarray(start, start + len), target_start)
   }
+
+  return len
 }
 
 // fill(value, start=0, end=buffer.length)
@@ -853,14 +1026,14 @@ Buffer.prototype.fill = function (value, start, end) {
   if (!start) start = 0
   if (!end) end = this.length
 
-  if (end < start) throw new TypeError('end < start')
+  if (end < start) throw new RangeError('end < start')
 
   // Fill 0 bytes; we're done
   if (end === start) return
   if (this.length === 0) return
 
-  if (start < 0 || start >= this.length) throw new TypeError('start out of bounds')
-  if (end < 0 || end > this.length) throw new TypeError('end out of bounds')
+  if (start < 0 || start >= this.length) throw new RangeError('start out of bounds')
+  if (end < 0 || end > this.length) throw new RangeError('end out of bounds')
 
   var i
   if (typeof value === 'number') {
@@ -926,11 +1099,15 @@ Buffer._augment = function (arr) {
   arr.compare = BP.compare
   arr.copy = BP.copy
   arr.slice = BP.slice
+  arr.readUIntLE = BP.readUIntLE
+  arr.readUIntBE = BP.readUIntBE
   arr.readUInt8 = BP.readUInt8
   arr.readUInt16LE = BP.readUInt16LE
   arr.readUInt16BE = BP.readUInt16BE
   arr.readUInt32LE = BP.readUInt32LE
   arr.readUInt32BE = BP.readUInt32BE
+  arr.readIntLE = BP.readIntLE
+  arr.readIntBE = BP.readIntBE
   arr.readInt8 = BP.readInt8
   arr.readInt16LE = BP.readInt16LE
   arr.readInt16BE = BP.readInt16BE
@@ -941,10 +1118,14 @@ Buffer._augment = function (arr) {
   arr.readDoubleLE = BP.readDoubleLE
   arr.readDoubleBE = BP.readDoubleBE
   arr.writeUInt8 = BP.writeUInt8
+  arr.writeUIntLE = BP.writeUIntLE
+  arr.writeUIntBE = BP.writeUIntBE
   arr.writeUInt16LE = BP.writeUInt16LE
   arr.writeUInt16BE = BP.writeUInt16BE
   arr.writeUInt32LE = BP.writeUInt32LE
   arr.writeUInt32BE = BP.writeUInt32BE
+  arr.writeIntLE = BP.writeIntLE
+  arr.writeIntBE = BP.writeIntBE
   arr.writeInt8 = BP.writeInt8
   arr.writeInt16LE = BP.writeInt16LE
   arr.writeInt16BE = BP.writeInt16BE
@@ -961,11 +1142,13 @@ Buffer._augment = function (arr) {
   return arr
 }
 
-var INVALID_BASE64_RE = /[^+\/0-9A-z]/g
+var INVALID_BASE64_RE = /[^+\/0-9A-z\-]/g
 
 function base64clean (str) {
   // Node strips out invalid characters like \n and \t from the string, base64-js does not
   str = stringtrim(str).replace(INVALID_BASE64_RE, '')
+  // Node converts strings with length < 2 to ''
+  if (str.length < 2) return ''
   // Node allows for non-padded base64 strings (missing trailing ===), base64-js does not
   while (str.length % 4 !== 0) {
     str = str + '='
@@ -989,22 +1172,100 @@ function toHex (n) {
   return n.toString(16)
 }
 
-function utf8ToBytes (str) {
-  var byteArray = []
-  for (var i = 0; i < str.length; i++) {
-    var b = str.charCodeAt(i)
-    if (b <= 0x7F) {
-      byteArray.push(b)
-    } else {
-      var start = i
-      if (b >= 0xD800 && b <= 0xDFFF) i++
-      var h = encodeURIComponent(str.slice(start, i+1)).substr(1).split('%')
-      for (var j = 0; j < h.length; j++) {
-        byteArray.push(parseInt(h[j], 16))
+function utf8ToBytes(string, units) {
+  var codePoint, length = string.length
+  var leadSurrogate = null
+  units = units || Infinity
+  var bytes = []
+  var i = 0
+
+  for (; i<length; i++) {
+    codePoint = string.charCodeAt(i)
+
+    // is surrogate component
+    if (codePoint > 0xD7FF && codePoint < 0xE000) {
+
+      // last char was a lead
+      if (leadSurrogate) {
+
+        // 2 leads in a row
+        if (codePoint < 0xDC00) {
+          if ((units -= 3) > -1) bytes.push(0xEF, 0xBF, 0xBD)
+          leadSurrogate = codePoint
+          continue
+        }
+
+        // valid surrogate pair
+        else {
+          codePoint = leadSurrogate - 0xD800 << 10 | codePoint - 0xDC00 | 0x10000
+          leadSurrogate = null
+        }
+      }
+
+      // no lead yet
+      else {
+
+        // unexpected trail
+        if (codePoint > 0xDBFF) {
+          if ((units -= 3) > -1) bytes.push(0xEF, 0xBF, 0xBD)
+          continue
+        }
+
+        // unpaired lead
+        else if (i + 1 === length) {
+          if ((units -= 3) > -1) bytes.push(0xEF, 0xBF, 0xBD)
+          continue
+        }
+
+        // valid lead
+        else {
+          leadSurrogate = codePoint
+          continue
+        }
       }
     }
+
+    // valid bmp char, but last char was a lead
+    else if (leadSurrogate) {
+      if ((units -= 3) > -1) bytes.push(0xEF, 0xBF, 0xBD)
+      leadSurrogate = null
+    }
+
+    // encode utf8
+    if (codePoint < 0x80) {
+      if ((units -= 1) < 0) break
+      bytes.push(codePoint)
+    }
+    else if (codePoint < 0x800) {
+      if ((units -= 2) < 0) break
+      bytes.push(
+        codePoint >> 0x6 | 0xC0,
+        codePoint & 0x3F | 0x80
+      );
+    }
+    else if (codePoint < 0x10000) {
+      if ((units -= 3) < 0) break
+      bytes.push(
+        codePoint >> 0xC | 0xE0,
+        codePoint >> 0x6 & 0x3F | 0x80,
+        codePoint & 0x3F | 0x80
+      );
+    }
+    else if (codePoint < 0x200000) {
+      if ((units -= 4) < 0) break
+      bytes.push(
+        codePoint >> 0x12 | 0xF0,
+        codePoint >> 0xC & 0x3F | 0x80,
+        codePoint >> 0x6 & 0x3F | 0x80,
+        codePoint & 0x3F | 0x80
+      );
+    }
+    else {
+      throw new Error('Invalid code point')
+    }
   }
-  return byteArray
+
+  return bytes
 }
 
 function asciiToBytes (str) {
@@ -1016,10 +1277,13 @@ function asciiToBytes (str) {
   return byteArray
 }
 
-function utf16leToBytes (str) {
+function utf16leToBytes (str, units) {
   var c, hi, lo
   var byteArray = []
   for (var i = 0; i < str.length; i++) {
+
+    if ((units -= 2) < 0) break
+
     c = str.charCodeAt(i)
     hi = c >> 8
     lo = c % 256
@@ -1031,7 +1295,7 @@ function utf16leToBytes (str) {
 }
 
 function base64ToBytes (str) {
-  return base64.toByteArray(str)
+  return base64.toByteArray(base64clean(str))
 }
 
 function blitBuffer (src, dst, offset, length, unitSize) {
@@ -1067,12 +1331,16 @@ var lookup = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/';
 	var NUMBER = '0'.charCodeAt(0)
 	var LOWER  = 'a'.charCodeAt(0)
 	var UPPER  = 'A'.charCodeAt(0)
+	var PLUS_URL_SAFE = '-'.charCodeAt(0)
+	var SLASH_URL_SAFE = '_'.charCodeAt(0)
 
 	function decode (elt) {
 		var code = elt.charCodeAt(0)
-		if (code === PLUS)
+		if (code === PLUS ||
+		    code === PLUS_URL_SAFE)
 			return 62 // '+'
-		if (code === SLASH)
+		if (code === SLASH ||
+		    code === SLASH_URL_SAFE)
 			return 63 // '/'
 		if (code < NUMBER)
 			return -1 //no match
@@ -13649,16 +13917,22 @@ Backbone.$ = window.$;
 var Router = Backbone.Router.extend({
 
     initialize: function() {
-        Backbone.history.start();
+        Backbone.history.start({
+            pushState: false
+        });
     },
     
     routes: {
-        "" : "home",
+        "" : "static",
         "app" : "app" 
     },
 
-    home: function() {
-        new views.Home();
+    static: function() {
+        // only render home if path does not inclue `/login`
+        var pathname = window.location.pathname;
+        if(!pathname.match(/login/g)) {
+            new views.Home();
+        }       
     },
 
     app : function() {
@@ -13696,7 +13970,7 @@ var _ = require('underscore');
 Backbone.$ = window.$;
 
 var templates = {
-    home: Buffer("PGhlYWRlciBjbGFzcz0iZ2xvYmFsLWhlYWRlciI+CiAgICA8bmF2IGNsYXNzPSJuYXZiYXIgbmF2YmFyLWZpeGVkLXRvcCBnbG9iYWwtbmF2Ij4KICAgICAgICA8ZGl2IGNsYXNzPSJjb250YWluZXIiPgogICAgICAgICAgICA8YSBjbGFzcz0ibmFidmFyLWJyYW5kIiBocmVmPSIvIj4KICAgICAgICAgICAgICAgIDxpbWcgYWx0PSJWZWVTZWUiIHNyYz0iaW1nL2xvZ28ucG5nIj4KICAgICAgICAgICAgPC9hPgogICAgICAgICAgICA8dWwgY2xhc3M9Im5hdiBuYXZiYXItbmF2IG5hdmJhci1yaWdodCI+CiAgICAgICAgICAgICAgICA8bGk+CiAgICAgICAgICAgICAgICAgICAgPGEgY2xhc3M9ImhpZ2hsaWdodCIgaHJlZj0iIyI+TGF1bmNoPC9hPgogICAgICAgICAgICAgICAgPC9saT4KICAgICAgICAgICAgICAgIDxsaT4KICAgICAgICAgICAgICAgICAgICA8YSBocmVmPSIjIj5Mb2dpbjwvYT4KICAgICAgICAgICAgICAgIDwvbGk+CiAgICAgICAgICAgICAgICA8bGk+CiAgICAgICAgICAgICAgICAgICAgPGEgaHJlZj0iIj5BYm91dDwvYT4KICAgICAgICAgICAgICAgIDwvbGk+CiAgICAgICAgICAgIDwvdWw+PCEtLSAubmF2Lm5hdmJhci1uYXYubmF2YmFyLXJpZ2h0IC0tPgogICAgICAgIDwvZGl2PjwhLS0gLmNvbnRhaW5lciAtLT4KICAgIDwvbmF2PjwhLS0gLm5hdmJhci5uYXZiYXItZml4ZWQtdG9wIC0tPgo8L2hlYWRlcj48IS0tIC5nbG9iYWwtaGVhZGVyIC0tPgoKPGRpdiBjbGFzcz0ibW92aWUtc2NyZWVuc2hvdCBmdWxsLWhlaWdodCI+PC9kaXY+Cgo8ZGl2IGNsYXNzPSJjb250YWluZXIgYWJvdmUtZm9sZCBmdWxsLWhlaWdodCI+CiAgICA8ZGl2IGNsYXNzPSJtaWRkbGUtYWxpZ24iPgogICAgICAgIDxkaXYgY2xhc3M9InJvdyI+CiAgICAgICAgICAgIDxkaXYgY2xhc3M9ImNvbC1tZC0xMiI+CiAgICAgICAgICAgICAgICA8aDEgY2xhc3M9ImZpcnN0LXRpdGxlIj5UaGlzIGlzIFZlZVNlZS48L2gxPgogICAgICAgICAgICAgICAgPGgyIGNsYXNzPSJ0YWdsaW5lIj5NYWtpbmcgc2Vuc2Ugb2YgdmFsdWF0aW9uLjwvaDI+CiAgICAgICAgICAgICAgICA8YSBjbGFzcz0ianMtcGxheS1tb3ZpZSBwbGF5LW1vdmllIiBocmVmPSIjIj4KICAgICAgICAgICAgICAgICAgICA8c3BhbiBjbGFzcz0iZ2x5cGhpY29uIGdseXBoaWNvbi1wbGF5IiBhcmlhLWhpZGRlbj0idHJ1ZSI+PC9zcGFuPgogICAgICAgICAgICAgICAgICAgIFdhdGNoIFRoZSBNb3ZpZQogICAgICAgICAgICAgICAgPC9hPgogICAgICAgICAgICA8L2Rpdj48IS0tIC5jb2wtbWQtMTIgLS0+CiAgICAgICAgPC9kaXY+PCEtLSAucm93IC0tPiAKICAgICAgICA8YSBjbGFzcz0ianMtc2Nyb2xsLWJlbG93LWZvbGQgc2Nyb2xsLWJlbG93LWZvbGQiIGhyZWY9IiMiPjwvYT4gICAgCiAgICA8L2Rpdj4KICAgIAo8L2Rpdj48IS0tIC5jb250YWluZXIuYWJvdmUtZm9sZCAtLT4KCjxkaXYgY2xhc3M9ImNvbnRhaW5lciBiZWxvdy1mb2xkIGZ1bGwtaGVpZ2h0Ij4KICAgIDxkaXYgY2xhc3M9Im1pZGRsZS1hbGlnbiI+CiAgICAgICAgPGRpdiBjbGFzcz0icm93Ij4KICAgICAgICAgICAgPGRpdiBjbGFzcz0iY29sLW1kLTEyIj4KICAgICAgICAgICAgICAgIDxoMyBjbGFzcz0iY29weSBlbSI+CiAgICAgICAgICAgICAgICAgICAgUmFpc2luZyBtb25leSBmcm9tIGFuIGludmVzdG9yIHRvZGF5ICAgCiAgICAgICAgICAgICAgICA8L2gzPgogICAgICAgICAgICAgICAgPGgzIGNsYXNzPSJjb3B5IGVtIj4KICAgICAgICAgICAgICAgICAgICBpcyBsaWtlIHRha2luZyBhIGJ1c2luZXNzIGxvYW4gZnJvbSBhIGxvYW4gb2ZmaWNlcgogICAgICAgICAgICAgICAgPC9oMz4KICAgICAgICAgICAgICAgIDxoMyBjbGFzcz0iY29weSBlbSBwdXNoLWRvd24iPgogICAgICAgICAgICAgICAgICAgICBpbiB0aGUgMTk1MOKAmXM6CiAgICAgICAgICAgICAgICA8L2gzPgogICAgICAgICAgICAgICAgPGgzIGNsYXNzPSJjb3B5Ij4KICAgICAgICAgICAgICAgICAgICBTaXR0aW5nIGluIGZyb250IG9mIGEgbG9hbiBvZmZpY2VyLCAKICAgICAgICAgICAgICAgIDwvaDM+CiAgICAgICAgICAgICAgICA8aDMgY2xhc3M9ImNvcHkiPgogICAgICAgICAgICAgICAgICAgIFB1dHRpbmcgeW91ciBiZXN0IHN1aXQgb24sICAKICAgICAgICAgICAgICAgIDwvaDM+CiAgICAgICAgICAgICAgICA8aDMgY2xhc3M9ImNvcHkiPgogICAgICAgICAgICAgICAgICAgIEJyaW5naW5nIGEgcHJlc2VudGF0aW9uLCBhbmQgCiAgICAgICAgICAgICAgICA8L2gzPgogICAgICAgICAgICAgICAgPGgzIGNsYXNzPSJjb3B5Ij4gICAgCiAgICAgICAgICAgICAgICAgICAgQmFraW5nIHRoZW0gY2FrZXMgKGlmIHRoYXQgd2FzIHlvdXIgdGhpbmcpLgogICAgICAgICAgICAgICAgPC9oMz4KICAgICAgICAgICAgPC9kaXY+PCEtLSAuY29sLW1kLTEyIC0tPgogICAgICAgIDwvZGl2PjwhLS0gLnJvdyAtLT4KICAgIAogICAgICAgIDxkaXYgY2xhc3M9InJvdyBpbnRyby10ZXh0Ij4KICAgICAgICAgICAgPGRpdiBjbGFzcz0iY29sLW1kLTQiPgogICAgICAgICAgICAgICAgPGg0PlByb2JsZW0gMTogUGVyY2VwdGlvbjwvaDQ+CiAgICAgICAgICAgICAgICA8cD4KICAgICAgICAgICAgICAgICAgICBXaXRoIG5vIHByaWNlZCBmaW5hbmNpbmcgcm91bmQsIG5vIHJldmVudWVzLCBhbmQgbm8gc3Vic3RhbnRpYWwgYXNzZXRzLCB0cmFkaXRpb25hbCBmaW5hbmNlIHRoZW9yaWVzIGNhbuKAmXQgaGVscCBlbnRyZXByZW5ldXJzIHdobyB3YW50IHRvIGVzdGFibGlzaCB0aGUgdmFsdWUgb2YgdGhlaXIgc3RhcnR1cHMuCiAgICAgICAgICAgICAgICA8L3A+ICAgICAgICAKICAgICAgICAgICAgICAgIDxwPgogICAgICAgICAgICAgICAgICAgIFZlZVNlZSBpcyBhIHRvb2wgdGhhdCBoZWxwcyBlbnRyZXByZW5ldXJzIGdldCBhIHByZS1tb25leSB2YWx1YXRpb24gYmFzZWQgb24gZmFjdG9ycyByZWxldmFudCB0byBhbiBlYXJseSBzdGFnZSBzdGFydHVwIChhbmQgdGhlaXIgcG90ZW50aWFsIGludmVzdG9ycykuCiAgICAgICAgICAgICAgICA8L3A+CiAgICAgICAgICAgIDwvZGl2PjwhLS0gLmNvbC1tZC00IC0tPiAgICAgICAKICAgICAgICAgICAgPGRpdiBjbGFzcz0iY29sLW1kLTQiPgogICAgICAgICAgICAgICAgPGg0PlByb2JsZW0gMjogRGF0YTwvaDQ+CiAgICAgICAgICAgICAgICA8cD4KICAgICAgICAgICAgICAgICAgICBKdXN0IGFzIGluZGl2aWR1YWxzIHdlcmUgKHBlcmNlaXZlZCkgdG8gYmUgdW5pcXVlLCB3ZSBsb29rIGF0IHN0YXJ0dXBzIGFzIHVuaXF1ZSBvcHBvcnR1bml0aWVzLgogICAgICAgICAgICAgICAgPC9wPiAgICAKICAgICAgICAgICAgICAgIDxwPgogICAgICAgICAgICAgICAgICAgIExvYW4gb2ZmaWNlcnMgdXNlZCB0byBjYWxsIG1lcmNoYW50cyBhbmQgYXNrIGlmIGFuIGluZGl2aWR1YWwgcGFpZCB0aGVpciBiaWxscyBvbiB0aW1lLiBTaW1pbGFybHksIHN0YXJ0dXBzIGtlZXAgdGhlaXIgaW5mb3JtYXRpb24gcHJpdmF0ZSwgYW5kIHN0YW5kYXJkaXppbmcgZGlzcGFyYXRlIGRhdGEgYWNyb3NzIGNvbXBhbmllcyBpcyB0aW1lIGNvbnN1bWluZyAgICAKICAgICAgICAgICAgICAgIDwvcD4KICAgICAgICAgICAgPC9kaXY+PCEtLSAuY29sLW1kLTQgLS0+CiAgICAgICAgICAgIDxkaXYgY2xhc3M9ImNvbC1tZC00Ij4KICAgICAgICAgICAgICAgIDxoND5Tb2x1dGlvbjo8L2g0PiAKICAgICAgICAgICAgICAgIDxwPgogICAgICAgICAgICAgICAgICAgIDEuIEVkdWNhdGUgb3Vyc2VsdmVzIHRoYXQgY29tcGFuaWVzLCBsaWtlIHBlb3BsZSwgYXJlIG5vdCB0aGF0IGRpZmZlcmVudCBmcm9tIG9uZWFub3RoZXIuIFRoZXkgYXJlIGFsbCBqdXN0IHRyeWluZyB0byBtYWtlIG1vbmV5LgogICAgICAgICAgICAgICAgPC9wPiAgIAogICAgICAgICAgICAgICAgPHA+CiAgICAgICAgICAgICAgICAgICAgMi4gVGFrZSBsb3RzIG9mIGRhdGEsIGZpZ3VyZSBvdXQgd2hpY2ggb25lcyBhcmUgaW1wb3J0YW50LCBzdGFuZGFyZGl6ZSB0aGVtLCBhbmQgbG9vayBmb3IgdHJlbmRzIAogICAgICAgICAgICAgICAgPC9wPgogICAgICAgICAgICA8L2Rpdj48IS0tIC5jb2wtbWQtNCAtLT4KICAgICAgICA8L2Rpdj48IS0tIC5yb3cgLS0+ICAgIAogICAgPC9kaXY+PCEtLSAubWlkZGxlLWFsaWduIC0tPgo8L2Rpdj48IS0tIC5jb250YWluZXIuYmVsb3ctZm9sZCAtLT4gCgo8ZGl2IGNsYXNzPSJjb250YWluZXIgYmVsb3ctZm9sZCBmdWxsLWhlaWdodCI+CiAgICA8ZGl2IGNsYXNzPSJtaWRkbGUtYWxpZ24iPgogICAgICAgIDxkaXYgY2xhc3M9InJvdyI+CiAgICAgICAgICAgIDxkaXYgY2xhc3M9ImNvbC1tZC0xMiI+CiAgICAgICAgICAgICAgICA8aDMgY2xhc3M9ImNvcHkiPgogICAgICAgICAgICAgICAgICAgIEN1cnJlbnQgZnVuZCByYWlzaW5nIHByYWN0aWNlcyBhcmUgYXJjaGFpYyAKICAgICAgICAgICAgICAgIDwvaDM+CiAgICAgICAgICAgICAgICA8aDMgY2xhc3M9ImNvcHkiPgogICAgICAgICAgICAgICAgICAgIGR1ZSB0byBjb21wbGV4aXR5IGluIG9uZSBxdWVzdGlvbjogCiAgICAgICAgICAgICAgICA8L2gzPgogICAgICAgICAgICAgICAgPGgzIGNsYXNzPSJjb3B5IGVtIj4KICAgICAgICAgICAgICAgICAgICBXaGF04oCZcyB0aGUgdmFsdWUgb2YgYSBwcm90b3R5cGUgYW5kIGEgdmlzaW9uPyAKICAgICAgICAgICAgICAgIDwvaDM+CiAgICAgICAgICAgICAgICA8aDMgY2xhc3M9ImNvcHkiPgogICAgICAgICAgICAgICAgICAgIFdlIHNldCBvdXQgdG8gZmluZCB0aGUgYW5zd2VyIHRvIHRoYXQgcXVlc3Rpb24uIAogICAgICAgICAgICAgICAgPC9oMz4KICAgICAgICAgICAgICAgIDxoMyBjbGFzcz0iY29weSI+ICAgIAogICAgICAgICAgICAgICAgICAgICJWZWVTZWUiIGlzIGEgdG9vbCB0aGF0IGhlbHBzIGVudHJlcHJlbmV1cnMgCiAgICAgICAgICAgICAgICA8L2gzPgogICAgICAgICAgICAgICAgPGgzIGNsYXNzPSJjb3B5Ij4KICAgICAgICAgICAgICAgICAgICBhbnN3ZXIgdGhhdCBzYW1lIHF1ZXN0aW9uLgogICAgICAgICAgICAgICAgPC9oMz4KICAgICAgICAgICAgPC9kaXY+PCEtLSAuY29sLW1kLTEyIC0tPgogICAgICAgIDwvZGl2PjwhLS0gLnJvdyAtLT4KICAgIAogICAgICAgIDxkaXYgY2xhc3M9InJvdyBpbnRyby10ZXh0Ij4KICAgICAgICAgICAgPGRpdiBjbGFzcz0iY29sLW1kLTQiPgogICAgICAgICAgICAgICAgPGg0PldoYXQ8L2g0PgogICAgICAgICAgICAgICAgPHA+CiAgICAgICAgICAgICAgICAgICAgV2l0aCBubyBwcmljZWQgZmluYW5jaW5nIHJvdW5kLCBubyByZXZlbnVlcywgYW5kIG5vIHN1YnN0YW50aWFsIGFzc2V0cywgdHJhZGl0aW9uYWwgZmluYW5jZSB0aGVvcmllcyBjYW7igJl0IGhlbHAgZW50cmVwcmVuZXVycyB3aG8gd2FudCB0byBlc3RhYmxpc2ggdGhlIHZhbHVlIG9mIHRoZWlyIHN0YXJ0dXBzLgogICAgICAgICAgICAgICAgPC9wPiAgICAgICAgCiAgICAgICAgICAgICAgICA8cD4KICAgICAgICAgICAgICAgICAgICBWZWVTZWUgaXMgYSB0b29sIHRoYXQgaGVscHMgZW50cmVwcmVuZXVycyBnZXQgYSBwcmUtbW9uZXkgdmFsdWF0aW9uIGJhc2VkIG9uIGZhY3RvcnMgcmVsZXZhbnQgdG8gYW4gZWFybHkgc3RhZ2Ugc3RhcnR1cCAoYW5kIHRoZWlyIHBvdGVudGlhbCBpbnZlc3RvcnMpLgogICAgICAgICAgICAgICAgPC9wPgogICAgICAgICAgICA8L2Rpdj48IS0tIC5jb2wtbWQtNCAtLT4gICAgICAgCiAgICAgICAgICAgIDxkaXYgY2xhc3M9ImNvbC1tZC00Ij4KICAgICAgICAgICAgICAgIDxoND5XaHk8L2g0PgogICAgICAgICAgICAgICAgPHA+CiAgICAgICAgICAgICAgICAgICAgUmVkdWNlZCBjb3N0IG9mIGlubm92YXRpb24gbWVhbnMgbWFueSBvZiB0aGUgcGFyYWRpZ20gc2hpZnRpbmcgaW5ub3ZhdGlvbnMgYXJlIGhhcHBlbmluZyBhdCB0aGUgZWFybGllciBzdGFnZXMgb2YgYSBjb21wYW554oCZcyBsaWZlIGN5Y2xlLgogICAgICAgICAgICAgICAgPC9wPiAgICAKICAgICAgICAgICAgICAgIDxwPgogICAgICAgICAgICAgICAgICAgIFdlIHdhbnRlZCB0byBjcmVhdGUgYSB0b29sIHRoYXQgd291bGQgZW5hYmxlIGVudHJlcHJlbmV1cnMgdG8gc2V0IHRoZWlyIGNvbXBhbnnigJlzIHZhbHVhdGlvbiBiYXNlZCBvbiBiZXR0ZXIgaW5zaWdodCBhbmQgY2xhcml0eSBvZiB0aGUgbWFya2V0LCBhbmQgaGVscCBpbnZlc3RvcnMgYmV0dGVyIGNvbW11bmljYXRlIHRoZWlyIHJlYXNvbmluZyBiZWhpbmQgdGhlaXIgb2ZmZXJzLiAgICAKICAgICAgICAgICAgICAgIDwvcD4KICAgICAgICAgICAgPC9kaXY+PCEtLSAuY29sLW1kLTQgLS0+CiAgICAgICAgICAgIDxkaXYgY2xhc3M9ImNvbC1tZC00Ij4KICAgICAgICAgICAgICAgIDxoND5Ib3c8L2g0PiAKICAgICAgICAgICAgICAgIDxwPgogICAgICAgICAgICAgICAgICAgIFdlIGF0dGVuZGVkIGRvemVucyBvZiBwaXRjaCBldmVudHMsIHRhbGtlZCB0byBtYW55IG1vcmUgaW52ZXN0b3JzLCBhbmQgYW5hbHl6ZWQgaHVuZHJlZHMgb2YgcGl0Y2ggZGVja3MgYW5kIHRlcm0gc2hlZXRzLiBPdXIgYW5hbHlzaXMgc2hvd2VkIHRoYXQgdGhlIHZhbHVlIHBsYWNlZCBvbiBhIHN0YXJ0dXAgY2FuIGJlIGRlZmluZWQgYnkgdGhlIHF1YWxpdHkgb2YgdGhlIG1hbmFnZW1lbnQgdGVhbSwgdGhlIHNpemUgb2YgdGhlIG1hcmtldCwgc3RhZ2Ugb2YgdGhlIHByb2R1Y3QgZGV2ZWxvcG1lbnQsIHRoZSBlc3RhYmxpc2hlZCBkaXN0cmlidXRpb24gY2hhbm5lbHMsIHRoZSBjb21wZXRpdGl2ZSBhZHZhbnRhZ2UsIHRyYWN0aW9uLCBhbmQgdGhlIG5ldHdvcmsgZWZmZWN0IG9mIHRoZXNlIGZhY3RvcnMgYW1vbmdzdCBlYWNoIG90aGVyLgogICAgICAgICAgICAgICAgPC9wPiAgIAogICAgICAgICAgICA8L2Rpdj48IS0tIC5jb2wtbWQtNCAtLT4KICAgICAgICA8L2Rpdj48IS0tIC5yb3cgLS0+ICAgIAogICAgPC9kaXY+PCEtLSAubWlkZGxlLWFsaWduIC0tPgogICAgPGZvb3RlciBjbGFzcz0iZ2xvYmFsLWZvb3RlciBib3R0b20iPgogICAgICAgICZjb3B5OyAyMDE1IFZlZVNlZQogICAgPC9mb290ZXI+CjwvZGl2PjwhLS0gLmNvbnRhaW5lci5iZWxvdy1mb2xkIC0tPiA=","base64"),
+    home: Buffer("PGhlYWRlciBjbGFzcz0iZ2xvYmFsLWhlYWRlciI+CiAgICA8bmF2IGNsYXNzPSJuYXZiYXIgbmF2YmFyLWZpeGVkLXRvcCBnbG9iYWwtbmF2Ij4KICAgICAgICA8ZGl2IGNsYXNzPSJjb250YWluZXIiPgogICAgICAgICAgICA8YSBjbGFzcz0ibmFidmFyLWJyYW5kIiBocmVmPSIvIj4KICAgICAgICAgICAgICAgIDxpbWcgYWx0PSJWZWVTZWUiIHNyYz0iaW1nL2xvZ28ucG5nIj4KICAgICAgICAgICAgPC9hPgogICAgICAgICAgICA8dWwgY2xhc3M9Im5hdiBuYXZiYXItbmF2IG5hdmJhci1yaWdodCI+CiAgICAgICAgICAgICAgICA8bGk+CiAgICAgICAgICAgICAgICAgICAgPGEgY2xhc3M9ImhpZ2hsaWdodCIgaHJlZj0iIyI+TGF1bmNoPC9hPgogICAgICAgICAgICAgICAgPC9saT4KICAgICAgICAgICAgICAgIDxsaT4KICAgICAgICAgICAgICAgICAgICA8YSBocmVmPSIvbG9naW4iPkxvZ2luPC9hPgogICAgICAgICAgICAgICAgPC9saT4KICAgICAgICAgICAgICAgIDxsaT4KICAgICAgICAgICAgICAgICAgICA8YSBocmVmPSIiPkFib3V0PC9hPgogICAgICAgICAgICAgICAgPC9saT4KICAgICAgICAgICAgPC91bD48IS0tIC5uYXYubmF2YmFyLW5hdi5uYXZiYXItcmlnaHQgLS0+CiAgICAgICAgPC9kaXY+PCEtLSAuY29udGFpbmVyIC0tPgogICAgPC9uYXY+PCEtLSAubmF2YmFyLm5hdmJhci1maXhlZC10b3AgLS0+CjwvaGVhZGVyPjwhLS0gLmdsb2JhbC1oZWFkZXIgLS0+Cgo8ZGl2IGNsYXNzPSJtb3ZpZS1zY3JlZW5zaG90IGZ1bGwtaGVpZ2h0Ij48L2Rpdj4KCjxkaXYgY2xhc3M9ImNvbnRhaW5lciBhYm92ZS1mb2xkIGZ1bGwtaGVpZ2h0Ij4KICAgIDxkaXYgY2xhc3M9Im1pZGRsZS1hbGlnbiI+CiAgICAgICAgPGRpdiBjbGFzcz0icm93Ij4KICAgICAgICAgICAgPGRpdiBjbGFzcz0iY29sLW1kLTEyIj4KICAgICAgICAgICAgICAgIDxoMSBjbGFzcz0iZmlyc3QtdGl0bGUiPlRoaXMgaXMgVmVlU2VlLjwvaDE+CiAgICAgICAgICAgICAgICA8aDIgY2xhc3M9InRhZ2xpbmUiPk1ha2luZyBzZW5zZSBvZiB2YWx1YXRpb24uPC9oMj4KICAgICAgICAgICAgICAgIDxhIGNsYXNzPSJqcy1wbGF5LW1vdmllIHBsYXktbW92aWUiIGhyZWY9IiMiPgogICAgICAgICAgICAgICAgICAgIDxzcGFuIGNsYXNzPSJnbHlwaGljb24gZ2x5cGhpY29uLXBsYXkiIGFyaWEtaGlkZGVuPSJ0cnVlIj48L3NwYW4+CiAgICAgICAgICAgICAgICAgICAgV2F0Y2ggVGhlIE1vdmllCiAgICAgICAgICAgICAgICA8L2E+CiAgICAgICAgICAgIDwvZGl2PjwhLS0gLmNvbC1tZC0xMiAtLT4KICAgICAgICA8L2Rpdj48IS0tIC5yb3cgLS0+IAogICAgICAgIDxhIGNsYXNzPSJqcy1zY3JvbGwtYmVsb3ctZm9sZCBzY3JvbGwtYmVsb3ctZm9sZCIgaHJlZj0iIyI+PC9hPiAgICAKICAgIDwvZGl2PgogICAgCjwvZGl2PjwhLS0gLmNvbnRhaW5lci5hYm92ZS1mb2xkIC0tPgoKPGRpdiBjbGFzcz0iY29udGFpbmVyIGJlbG93LWZvbGQgZnVsbC1oZWlnaHQiPgogICAgPGRpdiBjbGFzcz0ibWlkZGxlLWFsaWduIj4KICAgICAgICA8ZGl2IGNsYXNzPSJyb3ciPgogICAgICAgICAgICA8ZGl2IGNsYXNzPSJjb2wtbWQtMTIiPgogICAgICAgICAgICAgICAgPGgzIGNsYXNzPSJjb3B5IGVtIj4KICAgICAgICAgICAgICAgICAgICBSYWlzaW5nIG1vbmV5IGZyb20gYW4gaW52ZXN0b3IgdG9kYXkgICAKICAgICAgICAgICAgICAgIDwvaDM+CiAgICAgICAgICAgICAgICA8aDMgY2xhc3M9ImNvcHkgZW0iPgogICAgICAgICAgICAgICAgICAgIGlzIGxpa2UgdGFraW5nIGEgYnVzaW5lc3MgbG9hbiBmcm9tIGEgbG9hbiBvZmZpY2VyCiAgICAgICAgICAgICAgICA8L2gzPgogICAgICAgICAgICAgICAgPGgzIGNsYXNzPSJjb3B5IGVtIHB1c2gtZG93biI+CiAgICAgICAgICAgICAgICAgICAgIGluIHRoZSAxOTUw4oCZczoKICAgICAgICAgICAgICAgIDwvaDM+CiAgICAgICAgICAgICAgICA8aDMgY2xhc3M9ImNvcHkiPgogICAgICAgICAgICAgICAgICAgIFNpdHRpbmcgaW4gZnJvbnQgb2YgYSBsb2FuIG9mZmljZXIsIAogICAgICAgICAgICAgICAgPC9oMz4KICAgICAgICAgICAgICAgIDxoMyBjbGFzcz0iY29weSI+CiAgICAgICAgICAgICAgICAgICAgUHV0dGluZyB5b3VyIGJlc3Qgc3VpdCBvbiwgIAogICAgICAgICAgICAgICAgPC9oMz4KICAgICAgICAgICAgICAgIDxoMyBjbGFzcz0iY29weSI+CiAgICAgICAgICAgICAgICAgICAgQnJpbmdpbmcgYSBwcmVzZW50YXRpb24sIGFuZCAKICAgICAgICAgICAgICAgIDwvaDM+CiAgICAgICAgICAgICAgICA8aDMgY2xhc3M9ImNvcHkiPiAgICAKICAgICAgICAgICAgICAgICAgICBCYWtpbmcgdGhlbSBjYWtlcyAoaWYgdGhhdCB3YXMgeW91ciB0aGluZykuCiAgICAgICAgICAgICAgICA8L2gzPgogICAgICAgICAgICA8L2Rpdj48IS0tIC5jb2wtbWQtMTIgLS0+CiAgICAgICAgPC9kaXY+PCEtLSAucm93IC0tPgogICAgCiAgICAgICAgPGRpdiBjbGFzcz0icm93IGludHJvLXRleHQiPgogICAgICAgICAgICA8ZGl2IGNsYXNzPSJjb2wtbWQtNCI+CiAgICAgICAgICAgICAgICA8aDQ+UHJvYmxlbSAxOiBQZXJjZXB0aW9uPC9oND4KICAgICAgICAgICAgICAgIDxwPgogICAgICAgICAgICAgICAgICAgIFdpdGggbm8gcHJpY2VkIGZpbmFuY2luZyByb3VuZCwgbm8gcmV2ZW51ZXMsIGFuZCBubyBzdWJzdGFudGlhbCBhc3NldHMsIHRyYWRpdGlvbmFsIGZpbmFuY2UgdGhlb3JpZXMgY2Fu4oCZdCBoZWxwIGVudHJlcHJlbmV1cnMgd2hvIHdhbnQgdG8gZXN0YWJsaXNoIHRoZSB2YWx1ZSBvZiB0aGVpciBzdGFydHVwcy4KICAgICAgICAgICAgICAgIDwvcD4gICAgICAgIAogICAgICAgICAgICAgICAgPHA+CiAgICAgICAgICAgICAgICAgICAgVmVlU2VlIGlzIGEgdG9vbCB0aGF0IGhlbHBzIGVudHJlcHJlbmV1cnMgZ2V0IGEgcHJlLW1vbmV5IHZhbHVhdGlvbiBiYXNlZCBvbiBmYWN0b3JzIHJlbGV2YW50IHRvIGFuIGVhcmx5IHN0YWdlIHN0YXJ0dXAgKGFuZCB0aGVpciBwb3RlbnRpYWwgaW52ZXN0b3JzKS4KICAgICAgICAgICAgICAgIDwvcD4KICAgICAgICAgICAgPC9kaXY+PCEtLSAuY29sLW1kLTQgLS0+ICAgICAgIAogICAgICAgICAgICA8ZGl2IGNsYXNzPSJjb2wtbWQtNCI+CiAgICAgICAgICAgICAgICA8aDQ+UHJvYmxlbSAyOiBEYXRhPC9oND4KICAgICAgICAgICAgICAgIDxwPgogICAgICAgICAgICAgICAgICAgIEp1c3QgYXMgaW5kaXZpZHVhbHMgd2VyZSAocGVyY2VpdmVkKSB0byBiZSB1bmlxdWUsIHdlIGxvb2sgYXQgc3RhcnR1cHMgYXMgdW5pcXVlIG9wcG9ydHVuaXRpZXMuCiAgICAgICAgICAgICAgICA8L3A+ICAgIAogICAgICAgICAgICAgICAgPHA+CiAgICAgICAgICAgICAgICAgICAgTG9hbiBvZmZpY2VycyB1c2VkIHRvIGNhbGwgbWVyY2hhbnRzIGFuZCBhc2sgaWYgYW4gaW5kaXZpZHVhbCBwYWlkIHRoZWlyIGJpbGxzIG9uIHRpbWUuIFNpbWlsYXJseSwgc3RhcnR1cHMga2VlcCB0aGVpciBpbmZvcm1hdGlvbiBwcml2YXRlLCBhbmQgc3RhbmRhcmRpemluZyBkaXNwYXJhdGUgZGF0YSBhY3Jvc3MgY29tcGFuaWVzIGlzIHRpbWUgY29uc3VtaW5nICAgIAogICAgICAgICAgICAgICAgPC9wPgogICAgICAgICAgICA8L2Rpdj48IS0tIC5jb2wtbWQtNCAtLT4KICAgICAgICAgICAgPGRpdiBjbGFzcz0iY29sLW1kLTQiPgogICAgICAgICAgICAgICAgPGg0PlNvbHV0aW9uOjwvaDQ+IAogICAgICAgICAgICAgICAgPHA+CiAgICAgICAgICAgICAgICAgICAgMS4gRWR1Y2F0ZSBvdXJzZWx2ZXMgdGhhdCBjb21wYW5pZXMsIGxpa2UgcGVvcGxlLCBhcmUgbm90IHRoYXQgZGlmZmVyZW50IGZyb20gb25lYW5vdGhlci4gVGhleSBhcmUgYWxsIGp1c3QgdHJ5aW5nIHRvIG1ha2UgbW9uZXkuCiAgICAgICAgICAgICAgICA8L3A+ICAgCiAgICAgICAgICAgICAgICA8cD4KICAgICAgICAgICAgICAgICAgICAyLiBUYWtlIGxvdHMgb2YgZGF0YSwgZmlndXJlIG91dCB3aGljaCBvbmVzIGFyZSBpbXBvcnRhbnQsIHN0YW5kYXJkaXplIHRoZW0sIGFuZCBsb29rIGZvciB0cmVuZHMgCiAgICAgICAgICAgICAgICA8L3A+CiAgICAgICAgICAgIDwvZGl2PjwhLS0gLmNvbC1tZC00IC0tPgogICAgICAgIDwvZGl2PjwhLS0gLnJvdyAtLT4gICAgCiAgICA8L2Rpdj48IS0tIC5taWRkbGUtYWxpZ24gLS0+CjwvZGl2PjwhLS0gLmNvbnRhaW5lci5iZWxvdy1mb2xkIC0tPiAKCjxkaXYgY2xhc3M9ImNvbnRhaW5lciBiZWxvdy1mb2xkIGZ1bGwtaGVpZ2h0Ij4KICAgIDxkaXYgY2xhc3M9Im1pZGRsZS1hbGlnbiI+CiAgICAgICAgPGRpdiBjbGFzcz0icm93Ij4KICAgICAgICAgICAgPGRpdiBjbGFzcz0iY29sLW1kLTEyIj4KICAgICAgICAgICAgICAgIDxoMyBjbGFzcz0iY29weSI+CiAgICAgICAgICAgICAgICAgICAgQ3VycmVudCBmdW5kIHJhaXNpbmcgcHJhY3RpY2VzIGFyZSBhcmNoYWljIAogICAgICAgICAgICAgICAgPC9oMz4KICAgICAgICAgICAgICAgIDxoMyBjbGFzcz0iY29weSI+CiAgICAgICAgICAgICAgICAgICAgZHVlIHRvIGNvbXBsZXhpdHkgaW4gb25lIHF1ZXN0aW9uOiAKICAgICAgICAgICAgICAgIDwvaDM+CiAgICAgICAgICAgICAgICA8aDMgY2xhc3M9ImNvcHkgZW0iPgogICAgICAgICAgICAgICAgICAgIFdoYXTigJlzIHRoZSB2YWx1ZSBvZiBhIHByb3RvdHlwZSBhbmQgYSB2aXNpb24/IAogICAgICAgICAgICAgICAgPC9oMz4KICAgICAgICAgICAgICAgIDxoMyBjbGFzcz0iY29weSI+CiAgICAgICAgICAgICAgICAgICAgV2Ugc2V0IG91dCB0byBmaW5kIHRoZSBhbnN3ZXIgdG8gdGhhdCBxdWVzdGlvbi4gCiAgICAgICAgICAgICAgICA8L2gzPgogICAgICAgICAgICAgICAgPGgzIGNsYXNzPSJjb3B5Ij4gICAgCiAgICAgICAgICAgICAgICAgICAgIlZlZVNlZSIgaXMgYSB0b29sIHRoYXQgaGVscHMgZW50cmVwcmVuZXVycyAKICAgICAgICAgICAgICAgIDwvaDM+CiAgICAgICAgICAgICAgICA8aDMgY2xhc3M9ImNvcHkiPgogICAgICAgICAgICAgICAgICAgIGFuc3dlciB0aGF0IHNhbWUgcXVlc3Rpb24uCiAgICAgICAgICAgICAgICA8L2gzPgogICAgICAgICAgICA8L2Rpdj48IS0tIC5jb2wtbWQtMTIgLS0+CiAgICAgICAgPC9kaXY+PCEtLSAucm93IC0tPgogICAgCiAgICAgICAgPGRpdiBjbGFzcz0icm93IGludHJvLXRleHQiPgogICAgICAgICAgICA8ZGl2IGNsYXNzPSJjb2wtbWQtNCI+CiAgICAgICAgICAgICAgICA8aDQ+V2hhdDwvaDQ+CiAgICAgICAgICAgICAgICA8cD4KICAgICAgICAgICAgICAgICAgICBXaXRoIG5vIHByaWNlZCBmaW5hbmNpbmcgcm91bmQsIG5vIHJldmVudWVzLCBhbmQgbm8gc3Vic3RhbnRpYWwgYXNzZXRzLCB0cmFkaXRpb25hbCBmaW5hbmNlIHRoZW9yaWVzIGNhbuKAmXQgaGVscCBlbnRyZXByZW5ldXJzIHdobyB3YW50IHRvIGVzdGFibGlzaCB0aGUgdmFsdWUgb2YgdGhlaXIgc3RhcnR1cHMuCiAgICAgICAgICAgICAgICA8L3A+ICAgICAgICAKICAgICAgICAgICAgICAgIDxwPgogICAgICAgICAgICAgICAgICAgIFZlZVNlZSBpcyBhIHRvb2wgdGhhdCBoZWxwcyBlbnRyZXByZW5ldXJzIGdldCBhIHByZS1tb25leSB2YWx1YXRpb24gYmFzZWQgb24gZmFjdG9ycyByZWxldmFudCB0byBhbiBlYXJseSBzdGFnZSBzdGFydHVwIChhbmQgdGhlaXIgcG90ZW50aWFsIGludmVzdG9ycykuCiAgICAgICAgICAgICAgICA8L3A+CiAgICAgICAgICAgIDwvZGl2PjwhLS0gLmNvbC1tZC00IC0tPiAgICAgICAKICAgICAgICAgICAgPGRpdiBjbGFzcz0iY29sLW1kLTQiPgogICAgICAgICAgICAgICAgPGg0PldoeTwvaDQ+CiAgICAgICAgICAgICAgICA8cD4KICAgICAgICAgICAgICAgICAgICBSZWR1Y2VkIGNvc3Qgb2YgaW5ub3ZhdGlvbiBtZWFucyBtYW55IG9mIHRoZSBwYXJhZGlnbSBzaGlmdGluZyBpbm5vdmF0aW9ucyBhcmUgaGFwcGVuaW5nIGF0IHRoZSBlYXJsaWVyIHN0YWdlcyBvZiBhIGNvbXBhbnnigJlzIGxpZmUgY3ljbGUuCiAgICAgICAgICAgICAgICA8L3A+ICAgIAogICAgICAgICAgICAgICAgPHA+CiAgICAgICAgICAgICAgICAgICAgV2Ugd2FudGVkIHRvIGNyZWF0ZSBhIHRvb2wgdGhhdCB3b3VsZCBlbmFibGUgZW50cmVwcmVuZXVycyB0byBzZXQgdGhlaXIgY29tcGFueeKAmXMgdmFsdWF0aW9uIGJhc2VkIG9uIGJldHRlciBpbnNpZ2h0IGFuZCBjbGFyaXR5IG9mIHRoZSBtYXJrZXQsIGFuZCBoZWxwIGludmVzdG9ycyBiZXR0ZXIgY29tbXVuaWNhdGUgdGhlaXIgcmVhc29uaW5nIGJlaGluZCB0aGVpciBvZmZlcnMuICAgIAogICAgICAgICAgICAgICAgPC9wPgogICAgICAgICAgICA8L2Rpdj48IS0tIC5jb2wtbWQtNCAtLT4KICAgICAgICAgICAgPGRpdiBjbGFzcz0iY29sLW1kLTQiPgogICAgICAgICAgICAgICAgPGg0PkhvdzwvaDQ+IAogICAgICAgICAgICAgICAgPHA+CiAgICAgICAgICAgICAgICAgICAgV2UgYXR0ZW5kZWQgZG96ZW5zIG9mIHBpdGNoIGV2ZW50cywgdGFsa2VkIHRvIG1hbnkgbW9yZSBpbnZlc3RvcnMsIGFuZCBhbmFseXplZCBodW5kcmVkcyBvZiBwaXRjaCBkZWNrcyBhbmQgdGVybSBzaGVldHMuIE91ciBhbmFseXNpcyBzaG93ZWQgdGhhdCB0aGUgdmFsdWUgcGxhY2VkIG9uIGEgc3RhcnR1cCBjYW4gYmUgZGVmaW5lZCBieSB0aGUgcXVhbGl0eSBvZiB0aGUgbWFuYWdlbWVudCB0ZWFtLCB0aGUgc2l6ZSBvZiB0aGUgbWFya2V0LCBzdGFnZSBvZiB0aGUgcHJvZHVjdCBkZXZlbG9wbWVudCwgdGhlIGVzdGFibGlzaGVkIGRpc3RyaWJ1dGlvbiBjaGFubmVscywgdGhlIGNvbXBldGl0aXZlIGFkdmFudGFnZSwgdHJhY3Rpb24sIGFuZCB0aGUgbmV0d29yayBlZmZlY3Qgb2YgdGhlc2UgZmFjdG9ycyBhbW9uZ3N0IGVhY2ggb3RoZXIuCiAgICAgICAgICAgICAgICA8L3A+ICAgCiAgICAgICAgICAgIDwvZGl2PjwhLS0gLmNvbC1tZC00IC0tPgogICAgICAgIDwvZGl2PjwhLS0gLnJvdyAtLT4gICAgCiAgICA8L2Rpdj48IS0tIC5taWRkbGUtYWxpZ24gLS0+CiAgICA8Zm9vdGVyIGNsYXNzPSJnbG9iYWwtZm9vdGVyIGJvdHRvbSI+CiAgICAgICAgJmNvcHk7IDIwMTUgVmVlU2VlCiAgICA8L2Zvb3Rlcj4KPC9kaXY+PCEtLSAuY29udGFpbmVyLmJlbG93LWZvbGQgLS0+IA==","base64"),
     evaluator: Buffer("PGgxIGNsYXNzPSJ0aXRsZSI+Cgk8JT0gbW9kZWwudGl0bGUgJT4KPC9oMT4KCjxkaXYgY2xhc3M9InNsaWRlciI+PC9kaXY+Cgo8dWwgY2xhc3M9ImJyZWFrcG9pbnRzIGxpc3QtaW5saW5lICI+Cgk8JSBfLmVhY2gobW9kZWwuYnJlYWtwb2ludHMsIGZ1bmN0aW9uKGJyZWFrcG9pbnQpIHsgICU+Cgk8bGk+CgkJPCU9IGJyZWFrcG9pbnQgJT4KCTwvbGk+Cgk8JSB9KTsgJT4KPC91bD4=","base64"),
     evaluators: Buffer("PCEtLSBIVE1MIFRlbXBsYXRlIC0tPgo8IS0tIAo8aDE+CgkgVkVFU0VFIC0gYWxsIHNsaWRlcnMgCjwvaDE+Ci0tPgoKPHVsIGNsYXNzPSJuYXZpZ2F0aW9uIj4KCTxsaSBjbGFzcz0icHJldiBnbHlwaGljb24gZ2x5cGhpY29uLWNoZXZyb24tbGVmdCI+PC9saT4KCTxsaSBjbGFzcz0ibmV4dCBnbHlwaGljb24gZ2x5cGhpY29uLWNoZXZyb24tcmlnaHQiPjwvbGk+CjwvdWw+Cgo8ZGl2IGNsYXNzPSJjb2wteHMtMTAgY29sLXhzLW9mZnNldC0xIGV2YWx1YXRvcnMiPgoJPCEtLSBDb250ZW50IHJlbmRlcmVkIGJ5IGV2YWx1YXRvciB2aWV3IC0tPgkKPC9kaXY+Cgo8YSBjbGFzcz0iY2FsY3VsYXRlIGhpZGRlbiIgaHJlZj0iIyI+CglWYWx1YXRpb24gUmVzdWx0CjwvYT4=","base64"),
     results: Buffer("PGRpdiBjbGFzcz0iY29sLXhzLTEyIj4KCTxoMSBzdHlsZT0idGV4dC1hbGlnbjpjZW50ZXI7Ij4KCQlWYWx1YXRpb246Cgk8L2gxPgoJPGgzIHN0eWxlPSJ0ZXh0LWFsaWduOmNlbnRlcjsiPjwlPSBtb2RlbC52YWx1YXRpb24uZm9ybWF0dGVkLmZsb29yICU+IC0gPCU9IG1vZGVsLnZhbHVhdGlvbi5mb3JtYXR0ZWQuY2VpbGluZyAlPjwvaDM+Cgk8ZGl2IGNsYXNzPSJyb3ciPgoJCTwlIF8uZWFjaChtb2RlbC5mYWN0b3JzLCBmdW5jdGlvbihmYWN0b3IpIHsgJT4KCQkJPGRpdiBjbGFzcz0iY29sLXhzLTYiPgoJCQkJPGRpdiBjbGFzcz0icHJvZ3Jlc3MiPgoJCQkgCQk8ZGl2IGNsYXNzPSJwcm9ncmVzcy1iYXIgPCU9IGZhY3Rvci50aXRsZSAlPiIgcm9sZT0icHJvZ3Jlc3NiYXIiIGFyaWEtdmFsdWVub3c9IjwlPSBmYWN0b3IuZmFjdG9yICogMTAwICU+IiBhcmlhLXZhbHVlbWluPSIwIiBhcmlhLXZhbHVlbWF4PSIxMDAiIHN0eWxlPSJ3aWR0aDogPCU9IGZhY3Rvci5mYWN0b3IgKiAxMDAgJT4lIj4KCQkJICAgCQk8JT0gZmFjdG9yLnRpdGxlICU+IC0gPCU9IChmYWN0b3IuZmFjdG9yICogMTAwKS50b0ZpeGVkKDApICU+CgkJCSAgIAkJPC9kaXY+CgkJCQk8L2Rpdj4JCgkJCTwvZGl2PgoJCQkKCQk8JSB9KTsgJT4KCTwvZGl2PgoJCjwvZGl2Pg==","base64"),
