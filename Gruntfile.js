@@ -21,7 +21,7 @@ module.exports = function(grunt) {
                 files: { 'public/js/build/app.js': ['public/js/src/app.js'] }
             }, 
             options: {
-                //transform: ['browserify-shim'],
+                transform: ['brfs'],
                 //watch: true
             }
         },

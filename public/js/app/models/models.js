@@ -4,65 +4,50 @@
  * @class Evaluator
  * @extends Backbone.View
 */
+var $ = require('jquery');
+var Backbone = require('Backbone');
 
-define([
-    
-    "jquery", 
-    "backbone"], 
+var models = {
 
-    function($, Backbone) {
+    Evaluator : Backbone.Model.extend({
+        initialize : function() {
+            /*
+            this.on('change', function(model) {
+                console.warn(model.get('sliderValue'));
+            });   
+            */   
+        },
 
-    var models = {
+        defaults : {
+            'sliderValue' : 50
+        },
 
-        Evaluator : Backbone.Model.extend({
+        validate : function(attrs) {
 
-            initialize : function() {
-                /*
-                this.on('change', function(model) {
-                    console.warn(model.get('sliderValue'));
-                });   
-                */   
-            },
-            defaults : {
-                'sliderValue' : 50
-            },
+        }
+    }),
 
-            validate : function(attrs) {
+    Evaluators : Backbone.Model.extend({
+        initialize : function() {
+            console.log('Evaluators Model init');
+        }
+    }),
 
-            }
+    Home : Backbone.Model.extend({
+        initialize : function() {
+        },
+        
+        defaults : {
+            'message' : 'Welcome to VeeSee'
+        }
+    }),
 
+    Results : Backbone.Model.extend({
+        initialize : function() {
+            console.warn('Results page model');
+        }
+    })
 
-        }),
-        Evaluators : Backbone.Model.extend({
-            initialize : function() {
-                console.log('Evaluators Model init');
-            }
-        }),
+};
 
-        Home : Backbone.Model.extend({
-
-            initialize : function() {
-
-            },
-
-            defaults : {
-                'message' : 'Welcome to VeeSee'
-            }
-
-        }),
-
-        Results : Backbone.Model.extend({
-
-            initialize : function() {
-                console.warn('Results page model');
-            }
-            
-
-        })
-
-    };
-
-    return models;
-    
-
-});
+module.exports = models;
