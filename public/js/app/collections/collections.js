@@ -1,10 +1,11 @@
 /**
  * Describing all collections
 */
-var $ = require('jquery');
-var Backbone = require('Backbone');
+var $ = require('jquery')(window);
+var Backbone = require('backbone');
 var views = require('../views/views.js');
 var models = require('../models/models.js');
+Backbone.$ = window.$;
 
 var collections = {
 		

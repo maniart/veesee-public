@@ -54,7 +54,8 @@
   "browser": {
     "jquery": "./public/bower_components/jquery/jquery.js",
     "modernizr": "./public/bower_components/modernizr/modernizr.js",
-    "underscore": "./public/bower_components/underscore/underscore.js"
+    "underscore": "./public/bower_components/underscore/underscore.js",
+    "backbone": "./public/bower_components/backbone/backbone.js"
   },
   "browserify-shim": {
     "jquery": "$",

@@ -4,17 +4,19 @@
 */
 
 var fs = require('fs');
-var $ = require('jquery');
-var Backbone = require('Backbone');
+var $ = require('jquery')(window);
+var Backbone = require('backbone');
 var models = require('../models/models.js');
 var collections = require('../collections/collections.js');
+var _ = require('underscore');
+Backbone.$ = window.$;
 
 var templates = {
-    home: fs.readFileSync(__dirname + '../templates/home.html'),
-    evaluator: fs.readFileSync(__dirname + '../templates/evaluator.html'),
-    evaluators: fs.readFileSync(__dirname + '../templates/evaluators.html'),
-    results: fs.readFileSync(__dirname + '../templates/results.html'),
-    heading: fs.readFileSync(__dirname + '../templates/heading.html')
+    home: fs.readFileSync(__dirname + '/../templates/home.html'),
+    evaluator: fs.readFileSync(__dirname + '/../templates/evaluator.html'),
+    evaluators: fs.readFileSync(__dirname + '/../templates/evaluators.html'),
+    results: fs.readFileSync(__dirname + '/../templates/results.html'),
+    heading: fs.readFileSync(__dirname + '/../templates/heading.html')
 };
 
 var views = {
@@ -25,7 +27,7 @@ var views = {
         attributes : {
             'class' : 'evaluator hidden' 
         },
-        template : _.template(templates.evaluator),
+        template : _.template(templates.evaluator.toString()),
         reveal : function(cb) {
             this.$el.removeClass('hidden');
             this.animate('in');
@@ -44,17 +46,17 @@ var views = {
             switch(type) {
                 case 'in':
                     this.$el.addClass('fadeInDown animated').one('webkitAnimationEnd mozAnimationEnd MSAnimationEnd oanimationend animationend', function(){
-                        $(this).removeClass('fadeInDown animated');
+                        this.$(this).removeClass('fadeInDown animated');
                     }); 
                 break;
                 case 'out':
                     this.$el.addClass('fadeOutDown animated').one('webkitAnimationEnd mozAnimationEnd MSAnimationEnd oanimationend animationend', function(){
-                        $(this).removeClass('fadeOutDown animatepd');
+                        this.$(this).removeClass('fadeOutDown animatepd');
                     }); 
                 break;
                 default:
                     this.$el.addClass('fadeInDown animated').one('webkitAnimationEnd mozAnimationEnd MSAnimationEnd oanimationend animationend', function(){
-                        $(this).removeClass('fadeInDown animated');
+                        this.$(this).removeClass('fadeInDown animated');
                     }); 
                 break;
             }
@@ -69,7 +71,6 @@ var views = {
                 min : 0,
                 max : 100,
                 step : (function() {
-                    //debugger;
                     return self.model.get('sliderType') === 'mutuallyExclusive' ? 25 : 1; 
                 })(),
                 slide : function(event, ui) {
@@ -102,8 +103,11 @@ var views = {
 
     Evaluators : Backbone.View.extend({
 
-        $container : $('.app-container'),
-        template : _.template(templates.evaluators),
+        $container : (function() {
+            return this.$ && this.$('.app-container');
+        })(),
+        
+        template : _.template(templates.evaluators.toString()),
         tagName : 'section', 
         attributes : {
             'class' : 'row evaluators-container'
@@ -148,10 +152,10 @@ var views = {
             self.trigger('evaluators:calculateBtn:hide');
         },
         showCalculateBtn : function() {
-            $('.calculate').removeClass('hidden');
+            this.$('.calculate').removeClass('hidden');
         },
         hideCalculateBtn : function() {
-            $('.calculate').addClass('hidden');
+            this.$('.calculate').addClass('hidden');
         },
         attachListeners : function() {
             var self = this;
@@ -234,9 +238,11 @@ var views = {
 
     Results : Backbone.View.extend({
 
-        template : _.template(templates.result),
+        template : _.template(templates.results.toString()),
         tagName : 'section', 
-        $container : $('.app-container'),
+        $container : (function() {
+            return this.$ && this.$('.app-container');
+        })(),
         attributes : {
             'class' : 'row evaluation-results'
         },
@@ -252,11 +258,13 @@ var views = {
     }),
 
     Home : Backbone.View.extend({
-        $container : $('.app-container'),
-        template : _.template(templates.home),
+        $container : (function() {
+            return this.$ && this.$('.app-container');
+        })(),
+        template : _.template(templates.home.toString()),
         tagName : 'section',
         attributes : {
-            'class' : 'row home'
+            'class' : 'home-view'
         },
         render : function() {
             this.$el.html(this.template({}));

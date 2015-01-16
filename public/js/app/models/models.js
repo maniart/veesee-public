@@ -4,8 +4,9 @@
  * @class Evaluator
  * @extends Backbone.View
 */
-var $ = require('jquery');
-var Backbone = require('Backbone');
+var $ = require('jquery')(window);
+var Backbone = require('backbone');
+Backbone.$ = window.$;
 
 var models = {
 
