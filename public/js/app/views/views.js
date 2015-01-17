@@ -294,6 +294,14 @@ var views = {
         initialize : function(){
             console.warn('login view');
             this.render();
+        },
+        toggleForms : function() {
+            this.$('.login, .signup').toggle();
+        },
+        
+        events : {
+            'click .js-show-signup' : 'toggleForms',
+            'click .js-show-login' : 'toggleForms'
         }
 
     })
