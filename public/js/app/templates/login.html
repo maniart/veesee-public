@@ -1,0 +1,96 @@
+<header class="global-header">
+    <nav class="navbar navbar-fixed-top global-nav">
+        <div class="container">
+            <a class="nabvar-brand" href="/">
+                <img alt="VeeSee" src="img/logo.png">
+            </a>
+            <ul class="nav navbar-nav navbar-right">
+                <li>
+                    <a class="highlight" href="#app">Launch</a>
+                </li>
+                <li>
+                    <a href="/login">Login</a>
+                </li>
+                <li>
+                    <a href="/about">About</a>
+                </li>
+            </ul><!-- .nav.navbar-nav.navbar-right -->
+        </div><!-- .container -->
+    </nav><!-- .navbar.navbar-fixed-top -->
+</header><!-- .global-header -->
+
+<div class="container above-fold full-height">
+    <div class="row login-container">
+        <div class="col-md-7">
+            <div class="row">
+                <div class="col-md-12 well well-lg text-center login">
+                    <h1>Login</h1>
+                    <div class="height:50px;">
+                        <ul id="login-errors" class="parsley-error-list"></ul>
+                    </div>
+
+                    <form id="login-form" class="form" data-validate="parsley">
+                        <fieldset>
+                            <div class="control-group">
+                                <div class="controls">
+                                    <input type="text" id="login-username-input" name="username" placeholder="Username" value="" data-required="true" data-notblank="true">
+                                    <span class="help-block"></span>
+                                </div><!-- .controls -->
+                            </div><!-- .control-group -->
+                            <div class="control-group mb20">
+                                <div class="controls">
+                                    <input class="input-medium" type="password" id="login-password-input" placeholder="Password" name="user_password" value="" data-required="true" data-notblank="true" data-rangelength="[5,25]">
+                                    <span class="help-block"></span>
+                                </div><!-- .controls -->
+                            </div><!-- .control-group -->
+                            <a href="#" id="login-btn" class="btn btn-primary btn-lg" data-bypass="">Login</a>
+
+                        </fieldset>
+                    </form><!-- .login-form -->
+                </div><!-- .col-md-12 --> 
+                <div class="col-md-12 well well-lg text-center signup">
+                    <h1>Signup</h1>
+                    <div class="height:50px;">
+                        <ul id="signup-errors" class="parsley-error-list"></ul>
+                    </div>
+                    <form id="signup-form" class="form" data-validate="parsley">
+                        <fieldset>
+                            <div class="control-group">
+                                <div class="controls">
+                                    <input type="text" id="signup-username-input" name="username" placeholder="Username" value="" data-required="true" data-notblank="true">
+                                    <span class="help-block"></span>
+                                </div>
+                            </div>
+                            <div class="control-group">
+                                <div class="controls">
+                                    <input class="input-medium" type="password" id="signup-password-input" placeholder="Password" name="user_password" value="" data-required="true" data-notblank="true" data-rangelength="[5,25]">
+                                    <span class="help-block"></span>
+                                </div>
+                            </div>
+                            <div class="control-group mb20">
+                                <div class="controls">
+                                    <input class="input-medium" type="password" id="signup-password-confirm-input" placeholder="Confirm Password" name="user_password" value="" data-required="true" data-notblank="true" data-rangelength="[5,25]" data-equalto="#signup-password-input">
+                                    <span class="help-block"></span>
+                                </div>
+                            </div>
+                            <a href="#" id="signup-btn" class="btn btn-primary btn-lg" data-bypass="">Signup</a>
+                            
+                        </fieldset>
+                    </form>
+                </div><!-- .col-md-12 -->  
+            </div><!-- .row -->            
+        </div><!-- .col-md-12 -->
+        <div class="col-md-5 ">
+            <h1 class="">Login</h1>     
+            <p>
+                Lorem ipsum dolor sit amet, consectetur adipiscing elit. Etiam dignissim lobortis nisi, ac egestas nibh faucibus interdum. Morbi sed lacus nulla. Quisque volutpat dolor nec magna faucibus porttitor. Morbi at neque nulla. Aliquam congue mattis ante sit amet mattis. In hac habitasse platea dictumst. Vestibulum auctor ex a laoreet finibus. In nec libero in sem iaculis dignissim et id mi. Pellentesque auctor ex vel mattis tincidunt. Nullam non magna feugiat, feugiat sapien et, placerat neque. Ut aliquet elit tortor, rutrum euismod augue ornare et. In ante mi, egestas nec augue nec, tristique mattis justo. Ut faucibus quam et nisl mattis, nec porttitor arcu malesuada. Mauris a ex ut orci blandit ultricies eget a dolor. Duis consectetur nulla nec pretium blandit.
+            </p>           
+        </div><!-- .col-md-12 -->
+    </div><!-- .row --> 
+    
+    <footer class="global-footer bottom">
+        &copy; 2015 VeeSee
+    </footer> 
+</div><!-- .container.above-fold -->
+
+    

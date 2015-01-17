@@ -21,9 +21,11 @@ var Router = Backbone.Router.extend({
     },
 
     static: function() {
-        // only render home if path does not inclue `/login`
+        // only render home if path does not include `/login`
         var pathname = window.location.pathname;
-        if(!pathname.match(/login/g)) {
+        if(pathname.match(/login/g)) {
+            new views.Login();
+        } else {
             new views.Home();
         }       
     },
