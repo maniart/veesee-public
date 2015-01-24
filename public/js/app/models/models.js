@@ -34,14 +34,9 @@ var models = {
         }
     }),
 
-    Home : Backbone.Model.extend({
-        initialize : function() {
-        },
-        
-        defaults : {
-            'message' : 'Welcome to VeeSee'
-        }
-    }),
+    Home : Backbone.Model.extend({}),
+
+    Login : Backbone.Model.extend({}),
 
     Results : Backbone.Model.extend({
         initialize : function() {

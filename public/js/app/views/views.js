@@ -13,6 +13,7 @@ Backbone.$ = window.$;
 
 var templates = {
     home: fs.readFileSync(__dirname + '/../templates/home.html'),
+    login: fs.readFileSync(__dirname + '/../templates/login.html'),
     evaluator: fs.readFileSync(__dirname + '/../templates/evaluator.html'),
     evaluators: fs.readFileSync(__dirname + '/../templates/evaluators.html'),
     results: fs.readFileSync(__dirname + '/../templates/results.html'),
@@ -273,6 +274,34 @@ var views = {
         initialize : function(){
             console.warn('home view');
             this.render();
+        }
+
+    }),
+
+    Login : Backbone.View.extend({
+        $container : (function() {
+            return this.$ && this.$('.app-container');
+        })(),
+        template : _.template(templates.login.toString()),
+        tagName : 'section',
+        attributes : {
+            'class' : 'login-view'
+        },
+        render : function() {
+            this.$el.html(this.template({}));
+            this.$container.html('').append(this.$el);
+        },
+        initialize : function(){
+            console.warn('login view');
+            this.render();
+        },
+        toggleForms : function() {
+            this.$('.login, .signup').toggle();
+        },
+        
+        events : {
+            'click .js-show-signup' : 'toggleForms',
+            'click .js-show-login' : 'toggleForms'
         }
 
     })
