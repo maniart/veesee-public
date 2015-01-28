@@ -1,4 +1,4 @@
-(function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
+(function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({"/Users/nilchianim/Dropbox/projects/webapp-veesee-v2.0/node_modules/grunt-browserify/node_modules/browserify/node_modules/buffer/index.js":[function(require,module,exports){
 /*!
  * The buffer module from node.js, for the browser.
  *
@@ -1316,7 +1316,7 @@ function decodeUtf8Char (str) {
   }
 }
 
-},{"base64-js":2,"ieee754":3,"is-array":4}],2:[function(require,module,exports){
+},{"base64-js":"/Users/nilchianim/Dropbox/projects/webapp-veesee-v2.0/node_modules/grunt-browserify/node_modules/browserify/node_modules/buffer/node_modules/base64-js/lib/b64.js","ieee754":"/Users/nilchianim/Dropbox/projects/webapp-veesee-v2.0/node_modules/grunt-browserify/node_modules/browserify/node_modules/buffer/node_modules/ieee754/index.js","is-array":"/Users/nilchianim/Dropbox/projects/webapp-veesee-v2.0/node_modules/grunt-browserify/node_modules/browserify/node_modules/buffer/node_modules/is-array/index.js"}],"/Users/nilchianim/Dropbox/projects/webapp-veesee-v2.0/node_modules/grunt-browserify/node_modules/browserify/node_modules/buffer/node_modules/base64-js/lib/b64.js":[function(require,module,exports){
 var lookup = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/';
 
 ;(function (exports) {
@@ -1442,7 +1442,7 @@ var lookup = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/';
 	exports.fromByteArray = uint8ToBase64
 }(typeof exports === 'undefined' ? (this.base64js = {}) : exports))
 
-},{}],3:[function(require,module,exports){
+},{}],"/Users/nilchianim/Dropbox/projects/webapp-veesee-v2.0/node_modules/grunt-browserify/node_modules/browserify/node_modules/buffer/node_modules/ieee754/index.js":[function(require,module,exports){
 exports.read = function(buffer, offset, isLE, mLen, nBytes) {
   var e, m,
       eLen = nBytes * 8 - mLen - 1,
@@ -1528,7 +1528,7 @@ exports.write = function(buffer, value, offset, isLE, mLen, nBytes) {
   buffer[offset + i - d] |= s * 128;
 };
 
-},{}],4:[function(require,module,exports){
+},{}],"/Users/nilchianim/Dropbox/projects/webapp-veesee-v2.0/node_modules/grunt-browserify/node_modules/browserify/node_modules/buffer/node_modules/is-array/index.js":[function(require,module,exports){
 
 /**
  * isArray
@@ -1563,7 +1563,7 @@ module.exports = isArray || function (val) {
   return !! val && '[object Array]' == str.call(val);
 };
 
-},{}],5:[function(require,module,exports){
+},{}],"/Users/nilchianim/Dropbox/projects/webapp-veesee-v2.0/public/bower_components/backbone/backbone.js":[function(require,module,exports){
 //     Backbone.js 1.1.2
 
 //     (c) 2010-2014 Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
@@ -3173,7 +3173,7 @@ module.exports = isArray || function (val) {
 
 }));
 
-},{"underscore":7}],6:[function(require,module,exports){
+},{"underscore":"/Users/nilchianim/Dropbox/projects/webapp-veesee-v2.0/public/bower_components/underscore/underscore.js"}],"/Users/nilchianim/Dropbox/projects/webapp-veesee-v2.0/public/bower_components/jquery/jquery.js":[function(require,module,exports){
 (function (global){
 ;__browserify_shim_require__=require;(function browserifyShim(module, exports, require, define, browserify_shim__define__module__export__) {
 /*!
@@ -12387,7 +12387,7 @@ return jQuery;
 }).call(global, undefined, undefined, undefined, undefined, function defineExport(ex) { module.exports = ex; });
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],7:[function(require,module,exports){
+},{}],"/Users/nilchianim/Dropbox/projects/webapp-veesee-v2.0/public/bower_components/underscore/underscore.js":[function(require,module,exports){
 //     Underscore.js 1.7.0
 //     http://underscorejs.org
 //     (c) 2009-2014 Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
@@ -13804,7 +13804,7 @@ return jQuery;
   }
 }.call(this));
 
-},{}],8:[function(require,module,exports){
+},{}],"/Users/nilchianim/Dropbox/projects/webapp-veesee-v2.0/public/js/app/collections/collections.js":[function(require,module,exports){
 /**
  * Describing all collections
 */
@@ -13849,7 +13849,7 @@ var collections = {
 };
 
 module.exports = collections;
-},{"../models/models.js":9,"../views/views.js":11,"backbone":5,"jquery":6}],9:[function(require,module,exports){
+},{"../models/models.js":"/Users/nilchianim/Dropbox/projects/webapp-veesee-v2.0/public/js/app/models/models.js","../views/views.js":"/Users/nilchianim/Dropbox/projects/webapp-veesee-v2.0/public/js/app/views/views.js","backbone":"/Users/nilchianim/Dropbox/projects/webapp-veesee-v2.0/public/bower_components/backbone/backbone.js","jquery":"/Users/nilchianim/Dropbox/projects/webapp-veesee-v2.0/public/bower_components/jquery/jquery.js"}],"/Users/nilchianim/Dropbox/projects/webapp-veesee-v2.0/public/js/app/models/models.js":[function(require,module,exports){
 /**
  * Describes an object containing all Model constructors
  * @module Evaluator
@@ -13899,7 +13899,7 @@ var models = {
 };
 
 module.exports = models;
-},{"backbone":5,"jquery":6}],10:[function(require,module,exports){
+},{"backbone":"/Users/nilchianim/Dropbox/projects/webapp-veesee-v2.0/public/bower_components/backbone/backbone.js","jquery":"/Users/nilchianim/Dropbox/projects/webapp-veesee-v2.0/public/bower_components/jquery/jquery.js"}],"/Users/nilchianim/Dropbox/projects/webapp-veesee-v2.0/public/js/app/routers/Router.js":[function(require,module,exports){
 /**
     @module Router
 */
@@ -13949,7 +13949,7 @@ Router = Backbone.Router.extend({
 });
 
 module.exports = Router;
-},{"../collections/collections.js":8,"../models/models.js":9,"../views/views.js":11,"backbone":5,"jquery":6}],11:[function(require,module,exports){
+},{"../collections/collections.js":"/Users/nilchianim/Dropbox/projects/webapp-veesee-v2.0/public/js/app/collections/collections.js","../models/models.js":"/Users/nilchianim/Dropbox/projects/webapp-veesee-v2.0/public/js/app/models/models.js","../views/views.js":"/Users/nilchianim/Dropbox/projects/webapp-veesee-v2.0/public/js/app/views/views.js","backbone":"/Users/nilchianim/Dropbox/projects/webapp-veesee-v2.0/public/bower_components/backbone/backbone.js","jquery":"/Users/nilchianim/Dropbox/projects/webapp-veesee-v2.0/public/bower_components/jquery/jquery.js"}],"/Users/nilchianim/Dropbox/projects/webapp-veesee-v2.0/public/js/app/views/views.js":[function(require,module,exports){
 (function (Buffer){
 /**
  * @module views
@@ -14257,10 +14257,11 @@ views = {
         },
         
         render : function render() {
-            this.$el.html(this.template({token: 'foobartoken'}));
+            this.$el.html(this.template({token: 'yoyo'}));
             this.$container.html('').append(this.$el);
         },
         initialize : function initialize(){
+
             console.warn('login view');
             this.render();
         },
@@ -14283,10 +14284,10 @@ module.exports = views;
 
 
 }).call(this,require("buffer").Buffer)
-},{"../collections/collections.js":8,"../models/models.js":9,"backbone":5,"buffer":1,"jquery":6,"underscore":7}],12:[function(require,module,exports){
+},{"../collections/collections.js":"/Users/nilchianim/Dropbox/projects/webapp-veesee-v2.0/public/js/app/collections/collections.js","../models/models.js":"/Users/nilchianim/Dropbox/projects/webapp-veesee-v2.0/public/js/app/models/models.js","backbone":"/Users/nilchianim/Dropbox/projects/webapp-veesee-v2.0/public/bower_components/backbone/backbone.js","buffer":"/Users/nilchianim/Dropbox/projects/webapp-veesee-v2.0/node_modules/grunt-browserify/node_modules/browserify/node_modules/buffer/index.js","jquery":"/Users/nilchianim/Dropbox/projects/webapp-veesee-v2.0/public/bower_components/jquery/jquery.js","underscore":"/Users/nilchianim/Dropbox/projects/webapp-veesee-v2.0/public/bower_components/underscore/underscore.js"}],"/Users/nilchianim/Dropbox/projects/webapp-veesee-v2.0/public/js/src/app.js":[function(require,module,exports){
 var _ = require('underscore');
 var $ = require('jquery');
 var Router = require('../app/routers/Router.js');
 
 new Router();
-},{"../app/routers/Router.js":10,"jquery":6,"underscore":7}]},{},[12]);
+},{"../app/routers/Router.js":"/Users/nilchianim/Dropbox/projects/webapp-veesee-v2.0/public/js/app/routers/Router.js","jquery":"/Users/nilchianim/Dropbox/projects/webapp-veesee-v2.0/public/bower_components/jquery/jquery.js","underscore":"/Users/nilchianim/Dropbox/projects/webapp-veesee-v2.0/public/bower_components/underscore/underscore.js"}]},{},["/Users/nilchianim/Dropbox/projects/webapp-veesee-v2.0/public/js/src/app.js"]);

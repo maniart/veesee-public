@@ -15,52 +15,28 @@ module.exports = function(grunt) {
             }
         },
 
-        
         browserify: {
             dist: {
                 files: { 'public/js/build/app.js': ['public/js/src/app.js'] }
             }, 
             options: {
-                transform: ['brfs']
-                //watch: true
+                transform: ['brfs'],
+                watch: true
             }
         },
-        
-
-        // watchify: {
-        //     options: {
-        //         // defaults options used in b.bundle(opts)
-        //         detectGlobals: true,
-        //         insertGlobals: false,
-        //         ignoreMissing: false,
-        //         debug: false,
-        //         standalone: false,
-        //         keepalive: false,
-        //         callback: function(b) {
-        //             // configure the browserify instance here
-        //             b.add();
-        //             b.require();
-        //             b.external();
-        //             b.ignore();
-        //             b.transform();
-
-        //             // return it
-        //             return b;
-        //         }
-                
-        //     },
-        //     app: {
-        //         src: './public/js/src/app.js',
-        //         dest: './public/js/build/app.js'
-        //     }
-        // },
         
         less: {
             development: {
                 options: {
-                    compress: true,
-                    yuicompress: true,
-                    optimization: 2
+                    compress: false
+                },
+                files: {
+                    "public/css/build/main.min.css": "public/css/src/main.less"
+                }
+            },
+            production: {
+                options: {
+                    compress: true
                 },
                 files: {
                     "public/css/build/main.min.css": "public/css/src/main.less"
@@ -71,7 +47,7 @@ module.exports = function(grunt) {
         watch: {
             styles: {
                 files: ['public/**/*.less'], 
-                tasks: ['less'],
+                tasks: ['less:development'],
                 options: {
                     nospawn: true
                 }
@@ -86,7 +62,7 @@ module.exports = function(grunt) {
             },
             my_target: {
                 files: {
-                    'public/js/build/app.min.js': ['public/js/build/app.js']
+                    'public/js/build/app.js': ['public/js/build/app.js']
                 }
             }
         }
@@ -95,12 +71,19 @@ module.exports = function(grunt) {
 
     grunt.loadNpmTasks('grunt-contrib-less');
     grunt.loadNpmTasks('grunt-contrib-watch');
-    //grunt.loadNpmTasks('grunt-contrib-jshint');
     grunt.loadNpmTasks('grunt-bower-task');
     grunt.loadNpmTasks('grunt-browserify');
-    //grunt.loadNpmTasks('grunt-watchify');
     grunt.loadNpmTasks('grunt-contrib-uglify');
-
-    grunt.registerTask('default', ['browserify', 'watch']);
+    
+    grunt.registerTask('dev', [
+        'less:development',
+        'browserify',
+        'watch'
+    ]);
+    grunt.registerTask('prod', [
+        'less:production',
+        'browserify', 
+        'uglify'
+    ]);
 
 };

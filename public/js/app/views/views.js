@@ -304,10 +304,11 @@ views = {
         },
         
         render : function render() {
-            this.$el.html(this.template({token: 'foobartoken'}));
+            this.$el.html(this.template({token: 'yoyo'}));
             this.$container.html('').append(this.$el);
         },
         initialize : function initialize(){
+
             console.warn('login view');
             this.render();
         },
