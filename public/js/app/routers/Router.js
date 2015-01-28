@@ -29,7 +29,8 @@ Router = Backbone.Router.extend({
     },
 
     login: function login() {
-        new views.Login();
+        var loginModel = new models.Login({})
+          , loginView = new views.Login({model: loginModel});
     },
 
     app : function app() {

@@ -36,7 +36,12 @@ var models = {
 
     Home : Backbone.Model.extend({}),
 
-    Login : Backbone.Model.extend({}),
+    Login : Backbone.Model.extend({
+        urlRoot: '/login',
+        initialize: function initialize() {
+            console.warn('Login model');
+        }
+    }),
 
     Results : Backbone.Model.extend({
         initialize : function() {

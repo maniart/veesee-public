@@ -1,31 +1,48 @@
-var express = require('express');
-var path = require('path');
-var favicon = require('static-favicon');
-var logger = require('morgan');
-var bodyParser = require('body-parser');
-var npid = require('npid');
-var fs = require('fs');
-var debug = require('debug')('veesee');
-var api = require('./routes/api');
-var home = require('./routes/home');
-var login = require('./routes/login');
+// imports
+var express = require('express')
+  , path = require('path')
+  , favicon = require('static-favicon')
+  , logger = require('morgan')
+  , bodyParser = require('body-parser')
+  , npid = require('npid')
+  , fs = require('fs')
+  , compression = require('compression')
+  , debug = require('debug')('veesee')
+  , csrf = require('csurf')
+// custom modules
+  , api = require('./routes/api')
+  , home = require('./routes/home')
+  , login = require('./routes/login')
+// app
+  , app = express();
 
-var app = express();
-
-/*TODO: Favicon */
-//app.use(favicon(path.join(__dirname,'public','images','favicon.ico')));
-
+// middlewares
 app.use(logger('dev'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({
   extended: true
 }));
+app.use(compression({
+  threshold: 512
+}));
+
+
+
 app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/', home);
 app.use('/login', login);
 app.use('/api', api);
 
+
+  // error handler
+app.use(function (err, req, res, next) {
+  if (err.code !== 'EBADCSRFTOKEN') return next(err);
+
+  // handle CSRF token errors here
+  res.status(403)
+  res.send('session has expired or form tampered with')
+});
 
 app.set('port', process.env.PORT || 3030);
 

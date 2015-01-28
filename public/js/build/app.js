@@ -13888,7 +13888,12 @@ var models = {
 
     Home : Backbone.Model.extend({}),
 
-    Login : Backbone.Model.extend({}),
+    Login : Backbone.Model.extend({
+        urlRoot: '/login',
+        initialize: function initialize() {
+            console.warn('Login model');
+        }
+    }),
 
     Results : Backbone.Model.extend({
         initialize : function() {
@@ -13931,7 +13936,8 @@ Router = Backbone.Router.extend({
     },
 
     login: function login() {
-        new views.Login();
+        var loginModel = new models.Login({})
+          , loginView = new views.Login({model: loginModel});
     },
 
     app : function app() {
@@ -14256,14 +14262,23 @@ views = {
             'class' : 'login-view'
         },
         
-        render : function render() {
-            this.$el.html(this.template({token: 'yoyo'}));
+        render : function render(data) {
+            this.$el.html(this.template({token: this.model.get('csrfToken')}));
             this.$container.html('').append(this.$el);
         },
         initialize : function initialize(){
+            var render = _.bind(this.render, this);
+            this.model.on('change', render);
+            this.model.fetch({
+                success: function success(model, response, options) {
+                    console.debug('fetch success:', model, response, options);    
+                },
+                error: function error(model, response, options) {
+                    console.debug('fetch error:', model, response, options);
+                }
 
+            });
             console.warn('login view');
-            this.render();
         },
         toggleForms : function toggleForms() {
             this.$('.login, .signup').toggle();

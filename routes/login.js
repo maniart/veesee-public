@@ -1,18 +1,14 @@
-var express = require("express");
-var router = express.Router();
-var path = require('path');
+var express = require("express")
+  , router = express.Router()
+  , path = require('path')
+  , csrf = require('csurf');
 
 
-router.get('/', function(req, res, next) {
-	res.sendFile('login.html', { root:path.join(__dirname, '/../public/') }, function(err) {
-		if(err) {
-			console.log(err);
-			res.status(err.status).end();
-		} else {
-			console.log('Sent: login.html');
-		}
-	});	
-	next();
+
+// pass the csrfToken to the view
+router.get('/', function(req, res) {
+  //res.json({ csrfToken: req.csrfToken() });
+  res.json({ csrfToken: 'foobar' });
 });
 
 module.exports = router;
