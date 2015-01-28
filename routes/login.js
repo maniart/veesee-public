@@ -3,12 +3,11 @@ var express = require("express")
   , path = require('path')
   , csrf = require('csurf');
 
-
-
 // pass the csrfToken to the view
 router.get('/', function(req, res) {
-  //res.json({ csrfToken: req.csrfToken() });
-  res.json({ csrfToken: 'foobar' });
+	console.log('token: ', req.csrfToken());
+	res.json({ csrfToken: req.csrfToken() });
+	res.json({ csrfToken: 'foobar' });
 });
 
 module.exports = router;
