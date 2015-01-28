@@ -1,50 +1,48 @@
-// DesktopRouter.js
-// ----------------
-var $ = require('jquery')(window);
-var Backbone = require('backbone');
-var models = require('../models/models.js');
-var views = require('../views/views.js');
-var collections = require('../collections/collections.js');
+/**
+    @module Router
+*/
+
+var $ = require('jquery')(window)
+  , Backbone = require('backbone')
+  , models = require('../models/models.js')
+  , views = require('../views/views.js')
+  , collections = require('../collections/collections.js')
+  , Router;
+
 Backbone.$ = window.$;
 
-var Router = Backbone.Router.extend({
+Router = Backbone.Router.extend({
 
-    initialize: function() {
-        Backbone.history.start({
-            pushState: false
-        });
+    routes: {
+        ''      : 'home',
+        'login' : 'login',
+        'app'   : 'app'
+        
+    },
+
+    initialize: function initialize() {
+        Backbone.history.start({ pushState: false });
     },
     
-    routes: {
-        "" : "static",
-        "app" : "app" 
+    home: function home() {
+        new views.Home();       
     },
 
-    static: function() {
-        // only render home if path does not include `/login`
-        var pathname = window.location.pathname;
-        if(pathname.match(/login/g)) {
-            new views.Login();
-        } else {
-            new views.Home();
-        }       
+    login: function login() {
+        new views.Login();
     },
 
-    app : function() {
+    app : function app() {
         this.collection = new collections.Evaluators();
         this.collection.fetch({
             success : function(collection, response) {
-                new views.Evaluators({ collection : collection });    
+                new views.Evaluators({ collection: collection });    
             },
             error : function() {
-                console.error('DesktopRouter >> error while fetching for collection json data.');
+                console.error('Router >> error while fetching collection json data.');
             }
         });
-    }, 
-
-    result : function(arg) {
-        console.log('- result' ,arg);
-    }
+    } 
 
 });
 

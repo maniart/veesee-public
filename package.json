@@ -5,7 +5,7 @@
   "version": "1.8.0",
   "homepage": "",
   "scripts": {
-    "start": "node app.js"
+    "start": "nodemon app.js"
   },
   "author": {
     "name": "Mani Nilchiani",
