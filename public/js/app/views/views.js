@@ -304,7 +304,7 @@ views = {
         },
         
         render : function render() {
-            this.$el.html(this.template({}));
+            this.$el.html(this.template({token: 'foobartoken'}));
             this.$container.html('').append(this.$el);
         },
         initialize : function initialize(){
