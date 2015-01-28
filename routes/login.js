@@ -5,9 +5,7 @@ var express = require("express")
 
 // pass the csrfToken to the view
 router.get('/', function(req, res) {
-	console.log('token: ', req.csrfToken());
 	res.json({ csrfToken: req.csrfToken() });
-	res.json({ csrfToken: 'foobar' });
 });
 
 module.exports = router;

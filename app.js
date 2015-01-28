@@ -20,9 +20,11 @@ var express = require('express')
 
 // middlewares
 
-app.use(cookieParser('secret'));
+app.use(cookieParser('secret', {}));
 app.use(session({
-
+    secret: 'keyboard cat',
+    resave: false,
+    saveUninitialized: true
 }));
 app.use(csrf());
 app.use(logger('dev'));
@@ -33,8 +35,6 @@ app.use(bodyParser.urlencoded({
 app.use(compression({
   threshold: 512
 }));
-//
-console.log(csrf());
 
 app.use(express.static(path.join(__dirname, 'public')));
 
