@@ -13,28 +13,12 @@ Backbone.$ = window.$;
 var models = {
 
     Evaluator: Backbone.Model.extend({
-        initialize : function() {
-            /*
-            this.on('change', function(model) {
-                console.warn(model.get('sliderValue'));
-            });   
-            */   
-        },
-
         defaults: {
             'sliderValue' : 50
-        },
-
-        validate : function(attrs) {
-
         }
     }),
 
-    Evaluators: Backbone.Model.extend({
-        initialize : function() {
-            console.log('Evaluators Model init');
-        }
-    }),
+    Evaluators: Backbone.Model.extend({}),
 
     Home: Backbone.Model.extend({
         url: '/token',
@@ -44,15 +28,12 @@ var models = {
     }),
 
     Login: Backbone.Model.extend({
-        url: '/login',
-        initialize: function initialize() {
-            console.warn('Login model');
-        }   
+        url: '/login'  
     }),
 
     User: Backbone.Model.extend({
 
-        initialize: function(){
+        initialize: function initialize(){
             console.warn('new User model');
         },
 
@@ -93,12 +74,15 @@ var models = {
         },
 
 
+
         /*
          * Check for session from API 
          * The API will parse client cookies using its secret token
          * and return a user object if authenticated
          */
         checkAuth: function(callback, args) {
+
+            
             var self = this;
             this.fetch({ 
                 success: function(mod, res){

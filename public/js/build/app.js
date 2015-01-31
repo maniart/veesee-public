@@ -13865,28 +13865,12 @@ Backbone.$ = window.$;
 var models = {
 
     Evaluator: Backbone.Model.extend({
-        initialize : function() {
-            /*
-            this.on('change', function(model) {
-                console.warn(model.get('sliderValue'));
-            });   
-            */   
-        },
-
         defaults: {
             'sliderValue' : 50
-        },
-
-        validate : function(attrs) {
-
         }
     }),
 
-    Evaluators: Backbone.Model.extend({
-        initialize : function() {
-            console.log('Evaluators Model init');
-        }
-    }),
+    Evaluators: Backbone.Model.extend({}),
 
     Home: Backbone.Model.extend({
         url: '/token',
@@ -13896,15 +13880,12 @@ var models = {
     }),
 
     Login: Backbone.Model.extend({
-        url: '/login',
-        initialize: function initialize() {
-            console.warn('Login model');
-        }   
+        url: '/login'  
     }),
 
     User: Backbone.Model.extend({
 
-        initialize: function(){
+        initialize: function initialize(){
             console.warn('new User model');
         },
 
@@ -13945,12 +13926,15 @@ var models = {
         },
 
 
+
         /*
          * Check for session from API 
          * The API will parse client cookies using its secret token
          * and return a user object if authenticated
          */
         checkAuth: function(callback, args) {
+
+            
             var self = this;
             this.fetch({ 
                 success: function(mod, res){
@@ -14044,7 +14028,15 @@ var models = {
 };
 
 module.exports = models;
-},{"backbone":"/Users/nilchianim/Dropbox/projects/webapp-veesee-v2.0/public/bower_components/backbone/backbone.js","jquery":"/Users/nilchianim/Dropbox/projects/webapp-veesee-v2.0/public/bower_components/jquery/jquery.js","underscore":"/Users/nilchianim/Dropbox/projects/webapp-veesee-v2.0/public/bower_components/underscore/underscore.js"}],"/Users/nilchianim/Dropbox/projects/webapp-veesee-v2.0/public/js/app/routers/Router.js":[function(require,module,exports){
+},{"backbone":"/Users/nilchianim/Dropbox/projects/webapp-veesee-v2.0/public/bower_components/backbone/backbone.js","jquery":"/Users/nilchianim/Dropbox/projects/webapp-veesee-v2.0/public/bower_components/jquery/jquery.js","underscore":"/Users/nilchianim/Dropbox/projects/webapp-veesee-v2.0/public/bower_components/underscore/underscore.js"}],"/Users/nilchianim/Dropbox/projects/webapp-veesee-v2.0/public/js/app/models/session.js":[function(require,module,exports){
+var $ = require('jquery')(window)
+  , Backbone = require('backbone')
+  , models = require('../models/models.js')
+  , session;
+
+module.exports = new models.Session({});
+
+},{"../models/models.js":"/Users/nilchianim/Dropbox/projects/webapp-veesee-v2.0/public/js/app/models/models.js","backbone":"/Users/nilchianim/Dropbox/projects/webapp-veesee-v2.0/public/bower_components/backbone/backbone.js","jquery":"/Users/nilchianim/Dropbox/projects/webapp-veesee-v2.0/public/bower_components/jquery/jquery.js"}],"/Users/nilchianim/Dropbox/projects/webapp-veesee-v2.0/public/js/app/routers/Router.js":[function(require,module,exports){
 /**
     @module Router
 */
@@ -14054,6 +14046,7 @@ var $ = require('jquery')(window)
   , models = require('../models/models.js')
   , views = require('../views/views.js')
   , collections = require('../collections/collections.js')
+  , session = require('../models/session.js')
   , Router;
 
 Backbone.$ = window.$;
@@ -14069,6 +14062,7 @@ Router = Backbone.Router.extend({
 
     initialize: function initialize() {
         Backbone.history.start({pushState: false });                
+        console.log('session: ', session);
     },
     
     home: function home() {
@@ -14098,7 +14092,7 @@ Router = Backbone.Router.extend({
 });
 
 module.exports = Router;
-},{"../collections/collections.js":"/Users/nilchianim/Dropbox/projects/webapp-veesee-v2.0/public/js/app/collections/collections.js","../models/models.js":"/Users/nilchianim/Dropbox/projects/webapp-veesee-v2.0/public/js/app/models/models.js","../views/views.js":"/Users/nilchianim/Dropbox/projects/webapp-veesee-v2.0/public/js/app/views/views.js","backbone":"/Users/nilchianim/Dropbox/projects/webapp-veesee-v2.0/public/bower_components/backbone/backbone.js","jquery":"/Users/nilchianim/Dropbox/projects/webapp-veesee-v2.0/public/bower_components/jquery/jquery.js"}],"/Users/nilchianim/Dropbox/projects/webapp-veesee-v2.0/public/js/app/views/views.js":[function(require,module,exports){
+},{"../collections/collections.js":"/Users/nilchianim/Dropbox/projects/webapp-veesee-v2.0/public/js/app/collections/collections.js","../models/models.js":"/Users/nilchianim/Dropbox/projects/webapp-veesee-v2.0/public/js/app/models/models.js","../models/session.js":"/Users/nilchianim/Dropbox/projects/webapp-veesee-v2.0/public/js/app/models/session.js","../views/views.js":"/Users/nilchianim/Dropbox/projects/webapp-veesee-v2.0/public/js/app/views/views.js","backbone":"/Users/nilchianim/Dropbox/projects/webapp-veesee-v2.0/public/bower_components/backbone/backbone.js","jquery":"/Users/nilchianim/Dropbox/projects/webapp-veesee-v2.0/public/bower_components/jquery/jquery.js"}],"/Users/nilchianim/Dropbox/projects/webapp-veesee-v2.0/public/js/app/views/views.js":[function(require,module,exports){
 (function (Buffer){
 /**
  * @module views

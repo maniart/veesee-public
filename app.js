@@ -1,4 +1,4 @@
-// imports
+    // imports
 var express = require('express')
   , path = require('path')
   , favicon = require('static-favicon')
@@ -11,6 +11,8 @@ var express = require('express')
   , cookieParser = require('cookie-parser')
   , session = require('express-session')
   , csrf = require('csurf')
+  , bcrypt = require('bcrypt')
+  , mongoose = require('mongoose')
 // custom modules
   , api = require('./routes/api')
   , home = require('./routes/home')

@@ -7,6 +7,7 @@ var $ = require('jquery')(window)
   , models = require('../models/models.js')
   , views = require('../views/views.js')
   , collections = require('../collections/collections.js')
+  , session = require('../models/session.js')
   , Router;
 
 Backbone.$ = window.$;
@@ -22,6 +23,7 @@ Router = Backbone.Router.extend({
 
     initialize: function initialize() {
         Backbone.history.start({pushState: false });                
+        console.log('session: ', session);
     },
     
     home: function home() {
