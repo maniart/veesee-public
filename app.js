@@ -20,9 +20,9 @@ var express = require('express')
 
 // middlewares
 
-app.use(cookieParser('secret', {}));
+app.use(cookieParser('123foracheaperprice', {}));
 app.use(session({
-    secret: 'keyboard cat',
+    secret: 'buyingbetterproduce321',
     resave: false,
     saveUninitialized: true
 }));

@@ -278,13 +278,13 @@ views = {
         },
         
         render: function render() {
-            this.$el.html(this.template({}));
+            this.$el.html(this.template({token: this.model.get('csrfToken')}));
             this.$container.html('').append(this.$el);
         },
         
         initialize: function initialize(){
-            console.warn('home view');
-            this.render();
+            var render = _.bind(this.render, this);
+            this.model.on('change', render);
         }
 
     }),
@@ -304,24 +304,17 @@ views = {
         },
         
         render : function render(data) {
-            this.$el.html(this.template({token: this.model.get('csrfToken')}));
+            this.$el.html(this.template({}));
             this.$container.html('').append(this.$el);
         },
-        initialize : function initialize(){
-            var render = _.bind(this.render, this);
-            this.model.on('change', render);
-            this.model.fetch({
-                success: function success(model, response, options) {
-                    console.debug('fetch success:', model, response, options);    
-                },
-                error: function error(model, response, options) {
-                    console.debug('fetch error:', model, response, options);
-                }
 
-            });
+        initialize : function initialize(){
+            this.render();
             console.warn('login view');
         },
-        toggleForms : function toggleForms() {
+        
+        toggleForms : function toggleForms(event) {
+            event.preventDefault();
             this.$('.login, .signup').toggle();
         },
         

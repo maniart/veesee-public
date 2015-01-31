@@ -21,14 +21,17 @@ Router = Backbone.Router.extend({
     },
 
     initialize: function initialize() {
-        Backbone.history.start({ pushState: false });
+        Backbone.history.start({pushState: false });                
     },
     
     home: function home() {
-        new views.Home();       
+        console.log('home route');
+        var homeModel = new models.Home({})
+          , homeView = new views.Home({model: homeModel});
     },
 
     login: function login() {
+        console.log('login route');
         var loginModel = new models.Login({})
           , loginView = new views.Login({model: loginModel});
     },

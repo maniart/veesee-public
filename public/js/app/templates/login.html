@@ -34,7 +34,6 @@
                         <fieldset>
                             <div class="control-group">
                                 <div class="controls">
-                                    <input type="hidden" id="csrf-token" name="csrf-token" readonly value="<%= token %>">
                                     <input type="text" id="login-username-input" name="username" placeholder="Username" value="" data-required="true" data-notblank="true">
                                     <span class="help-block"></span>
                                 </div><!-- .controls -->
@@ -46,7 +45,8 @@
                                 </div><!-- .controls -->
                             </div><!-- .control-group -->
                             <a href="#" id="login-btn" class="btn btn-primary btn-lg" data-bypass="">Login</a>
-                            <a class="show-signup js-show-signup" href="#">Not a member? Signup!</a>
+                            
+                            <a class="show-signup js-show-signup" href="">Not a member? Signup!</a>
 
                         </fieldset>
                     </form><!-- .login-form -->
