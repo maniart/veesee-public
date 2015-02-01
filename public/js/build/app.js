@@ -13879,9 +13879,7 @@ var models = {
         }
     }),
 
-    Login: Backbone.Model.extend({
-        url: '/login'  
-    }),
+    Login: Backbone.Model.extend({}),
 
     User: Backbone.Model.extend({
 
@@ -13918,7 +13916,7 @@ var models = {
         },
 
 
-        urlRoot: '/auth',
+        url: '/auth',
 
         // Fxn to update user attributes after recieving API response
         updateSessionUser: function( userData ){
@@ -13934,7 +13932,7 @@ var models = {
          */
         checkAuth: function(callback, args) {
 
-            
+                
             var self = this;
             this.fetch({ 
                 success: function(mod, res){

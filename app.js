@@ -13,11 +13,12 @@ var express = require('express')
   , csrf = require('csurf')
   , bcrypt = require('bcrypt')
   , mongoose = require('mongoose')
-// custom modules
+  
+  // custom modules
   , api = require('./routes/api')
   , home = require('./routes/home')
-  , login = require('./routes/login')
-// app
+  , autho = require('./routes/auth')  
+  // app
   , app = express();
 
 // middlewares
@@ -40,12 +41,11 @@ app.use(compression({
 
 app.use(express.static(path.join(__dirname, 'public')));
 
+// routes
 app.use('/', home);
-app.use('/login', login);
 app.use('/api', api);
 
-
-
+// port
 app.set('port', process.env.PORT || 3030);
 
 
