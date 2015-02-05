@@ -17,7 +17,7 @@ var express = require('express')
   // custom modules
   , api = require('./routes/api')
   , home = require('./routes/home')
-  , autho = require('./routes/auth')  
+  , auth = require('./routes/auth')  
   // app
   , app = express();
 

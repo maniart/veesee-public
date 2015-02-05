@@ -84,7 +84,7 @@ router.post('/remove_account', function(req, res) {
     }, function(err){
         if(err) {
             res.json({ error: 'Error while trying to delete user.' }); 
-        } esle {
+        } else {
             res.clearCookie('user_id');
             res.clearCookie('auth_token');
             res.json({ success: 'User successfully deleted.' });    
