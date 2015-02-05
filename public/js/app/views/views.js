@@ -278,8 +278,11 @@ views = {
         },
         
         render: function render() {
-            this.$el.html(this.template({token: this.model.get('csrfToken')}));
+            this.$el.html(this.template({}));
             this.$container.html('').append(this.$el);
+            if(!this.$container.data('token')) {
+                this.$container.data('token', this.model.get('csrfToken'));
+            }
         },
         
         initialize: function initialize(){

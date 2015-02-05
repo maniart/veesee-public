@@ -5,6 +5,7 @@
 var $ = require('jquery')(window)
   , Backbone = require('backbone')
   , models = require('../models/models.js')
+  , session = require('../models/session.js')
   , views = require('../views/views.js')
   , collections = require('../collections/collections.js')
   , session = require('../models/session.js')
@@ -22,7 +23,18 @@ Router = Backbone.Router.extend({
     },
 
     initialize: function initialize() {
-        Backbone.history.start({pushState: false });                
+        
+        session.checkAuth({
+
+        // Start the backbone routing once we have captured a user's auth status
+        complete: function(one, two, three){
+
+            Backbone.history.start({pushState: false});
+            console.log('checkAuth', one, two, three);
+
+        }
+    });
+                        
         console.log('session: ', session);
     },
     

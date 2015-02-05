@@ -85,6 +85,7 @@ var models = {
             this.fetch({ 
                 success: function(mod, res){
                     if(!res.error && res.user){
+                        debugger;
                         self.updateSessionUser(res.user);
                         self.set({ logged_in : true });
                         if('success' in callback) callback.success(mod, res);    
@@ -93,6 +94,7 @@ var models = {
                         if('error' in callback) callback.error(mod, res);    
                     }
                 }, error:function(mod, res){
+                    debugger;
                     self.set({ logged_in : false });
                     if('error' in callback) callback.error(mod, res);    
                 }

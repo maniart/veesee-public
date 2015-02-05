@@ -44,6 +44,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 // routes
 app.use('/', home);
 app.use('/api', api);
+app.use('/auth', auth);
 
 // port
 app.set('port', process.env.PORT || 3030);
