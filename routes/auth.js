@@ -11,14 +11,21 @@ var express = require('express')
   , User = mongoose.model('User');
 
 router.get('/', function(req, res) {
-    db.get("SELECT * FROM users WHERE id = ? AND auth_token = ?", [ req.signedCookies.user_id, req.signedCookies.auth_token ], function(err, user){
-        if(user){
-            res.json({ user: _.omit(user, ['password', 'auth_token']) });   
-        } else {  
-            res.json({ error: "Client has no valid login cookies."  });   
+    User.find({
+        id: req.signedCookies.user_id,
+        auth_token: req.signedCookies.auth_token
+    }, function(err, user) {
+        if(err) {
+            res.json({ error: 'Error retrieving user.'});
+        } else {
+            if(user){
+                res.json({ user: _.omit(user, ['password', 'auth_token']) });   
+            } else {  
+                res.json({ error: "Client has no valid login cookies."  });   
+            }    
         }
+        
     });
-
 });
 
 router.post('/login', function(req, res) {
