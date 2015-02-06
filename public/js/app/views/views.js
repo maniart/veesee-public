@@ -2,12 +2,15 @@
  * @module views
 */
 
-var fs = require('fs'); // keeping the `var` declaration due to https://gist.github.com/maniart/4e7d3395ce0e55f2e67d
-var $ = require('jquery')(window)
+// keeping the `var` declaration due to https://gist.github.com/maniart/4e7d3395ce0e55f2e67d
+var fs = require('fs');
+var $ = require('jquery')/*(window)*/
   , Backbone = require('backbone')
   , models = require('../models/models.js')
+  , session = require('../models/session.js')
   , collections = require('../collections/collections.js')
   , _ = require('underscore')
+  , parsley = require('../../thirdparty/parsley.min.js')
   , templates = {
         home: fs.readFileSync(__dirname + '/../templates/home.html'),
         login: fs.readFileSync(__dirname + '/../templates/login.html'),
@@ -312,8 +315,17 @@ views = {
         },
 
         initialize : function initialize(){
-            this.render();
-            console.warn('login view');
+            //debugger;
+            if(this.model.get('csrfToken')) {
+                this.model.on('change', this.render);
+            } else {
+                this.render();
+            }
+            
+            session.on('change:logged_in',function(arg) {
+                console.log('and we are logged in!');
+            });
+            
         },
         
         toggleForms : function toggleForms(event) {
@@ -322,9 +334,89 @@ views = {
         },
         
         events : {
-            'click .js-show-signup': 'toggleForms',
-            'click .js-show-login': 'toggleForms'
+            'click .js-show-signup'                 : 'toggleForms',
+            'click .js-show-login'                  : 'toggleForms',
+            'click #login-btn'                      : 'onLoginAttempt',
+            'click #signup-btn'                     : 'onSignupAttempt',
+            'keyup #login-password-input'           : 'onPasswordKeyup',
+            'keyup #signup-password-confirm-input'  : 'onConfirmPasswordKeyup'
+        },
+
+        // Allow enter press to trigger login
+        onPasswordKeyup: function onPasswordKeyup(evt){
+            var k = evt.keyCode || evt.which;
+
+            if (k == 13 && $('#login-password-input').val() === ''){
+                evt.preventDefault();    // prevent enter-press submit when input is empty
+            } else if(k == 13){
+                evt.preventDefault();
+                this.onLoginAttempt();
+                return false;
+            }
+        },
+
+        // Allow enter press to trigger signup
+        onConfirmPasswordKeyup: function onConfirmPasswordKeyup(evt){
+            var k = evt.keyCode || evt.which;
+            if (k == 13 && $('#confirm-password-input').val() === ''){
+                evt.preventDefault();   // prevent enter-press submit when input is empty
+            } else if(k == 13){
+                evt.preventDefault();
+                this.onSignupAttempt();
+                return false;
+            }
+        },
+
+        onLoginAttempt: function onLoginAttempt(evt){
+            if(evt) evt.preventDefault();
+
+            if(this.$("#login-form").parsley('validate')){
+                    session.login({
+                        username: this.$("#login-username-input").val(),
+                        password: this.$("#login-password-input").val()
+                }, {
+                    success: function(mod, res){
+                        console.log("SUCCESS", mod, res);
+
+                    },
+                    error: function(err){
+                        console.log("ERROR", err);
+                        console.log('Bummer dude!', err.error, 'alert-danger'); 
+                        //app.showAlert('Bummer dude!', err.error, 'alert-danger'); 
+                    }
+                });
+            } else {
+                // Invalid clientside validations thru parsley
+                console.log("Did not pass clientside validation");
+
+            }
+        },
+        
+        onSignupAttempt: function onSignupAttempt(evt){
+            if(evt) evt.preventDefault();
+            //debugger;
+            if(this.$("#signup-form").parsley('validate')){
+                    session.signup({
+                        username: this.$("#signup-username-input").val(),
+                        password: this.$("#signup-password-input").val(),
+                        name: this.$("#signup-name-input").val()
+                }, {
+                    success: function(mod, res){
+                        console.log("SUCCESS", mod, res);
+
+                    },
+                    error: function(err){
+                        console.log("ERROR", err);
+                        console.log('Uh oh!', err.error, 'alert-danger'); 
+                    }
+                });
+            } else {
+                // Invalid clientside validations thru parsley
+                console.log("Did not pass clientside validation");
+
+            }
         }
+
 
     })
 

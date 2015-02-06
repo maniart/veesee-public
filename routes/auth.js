@@ -7,9 +7,18 @@ var express = require('express')
   , router = express.Router()
   , _ = require('underscore')
   , db = require('../db')
+  , config = require('../config.js')
   , mongoose = require('mongoose')
+  , bcrypt = require('bcrypt')
+  , cookieParser = require('cookie-parser')
+  , session = require('express-session')
   , User = mongoose.model('User');
-
+authpp.use(cookieParser('123foracheaperprice', {}));
+app.use(session({
+    secret: 'buyingbetterproduce321',
+    resave: false,
+    saveUninitialized: true
+}));
 router.get('/', function(req, res) {
     User.find({
         id: req.signedCookies.user_id,
@@ -52,19 +61,22 @@ router.post('/signup', function(req, res) {
     console.log('>>>  post /auth/signup');
     new User({
         username: req.body.username,
-        name: req.body.name,
+        //name: req.body.name,
         password: bcrypt.hashSync(req.body.password, 8),
         auth_token: bcrypt.genSaltSync(8)
     }).save(function(err, user) {
         if(err) {
+                       console.log('err - config: ', config);
 
             res.json({ error: 'Username has been taken.', field: 'username' }); 
         
         } else {
            // Set the user cookies and return the cleansed user data
-            res.cookie('user_id', user.id, { signed: true, maxAge: config.cookieMaxAge  });
-            res.cookie('auth_token', user.auth_token, { signed: true, maxAge: config.cookieMaxAge  });
-            res.json({ user: _.omit(user, ['password', 'auth_token']) });    
+            console.log(user);
+            console.log('success - config: ', config);
+            res.cookie('userId', user.id, { signed: true, maxAge: config.cookieMaxAge  });
+            res.cookie('authToken', user.authToken, { signed: true, maxAge: config.cookieMaxAge  });
+            res.json({ user: _.omit(user, ['password', 'authToken']) });    
         }
     });
 });
@@ -185,3 +197,4 @@ app.post("/api/auth/remove_account", function(req, res){
     });
 });
 */
+module.exports = router;

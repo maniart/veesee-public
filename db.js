@@ -4,7 +4,7 @@ var mongoose = require('mongoose')
     id: Number,
     username: String, 
     name: String,
-    auth_token: String,
+    authToken: String,
     password: String
   });
 

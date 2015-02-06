@@ -4,7 +4,7 @@
  * @class Evaluator
  * @extends Backbone.View
 */
-var $ = require('jquery')(window)
+var $ = require('jquery')/*(window)*/
   , Backbone = require('backbone')
   , _ = require('underscore');
 
@@ -27,7 +27,14 @@ var models = {
         }
     }),
 
-    Login: Backbone.Model.extend({}),
+    Login: Backbone.Model.extend({
+        url: '/token',
+        initialize: function initialize() {
+            if(!this.get('csrfToken')) {
+                this.fetch();
+            }
+        }
+    }),
 
     User: Backbone.Model.extend({
 
@@ -85,7 +92,6 @@ var models = {
             this.fetch({ 
                 success: function(mod, res){
                     if(!res.error && res.user){
-                        debugger;
                         self.updateSessionUser(res.user);
                         self.set({ logged_in : true });
                         if('success' in callback) callback.success(mod, res);    
@@ -94,7 +100,6 @@ var models = {
                         if('error' in callback) callback.error(mod, res);    
                     }
                 }, error:function(mod, res){
-                    debugger;
                     self.set({ logged_in : false });
                     if('error' in callback) callback.error(mod, res);    
                 }
@@ -114,13 +119,13 @@ var models = {
             var postData = _.omit(opts, 'method');
             console.log(postData);
             $.ajax({
-                url: this.url() + '/' + opts.method,
+                url: this.url + '/' + opts.method,
                 contentType: 'application/json',
                 dataType: 'json',
                 type: 'POST',
                 beforeSend: function(xhr) {
                     // Set the CSRF Token in the header for security
-                    var token = $('input[name="csrf-token"]').attr('value');
+                    var token = $('.app-container').data('token');
                     if (token) xhr.setRequestHeader('X-CSRF-Token', token);
                 },
                 data:  JSON.stringify( _.omit(opts, 'method') ),
