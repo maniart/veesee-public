@@ -13875,16 +13875,14 @@ var models = {
     Home: Backbone.Model.extend({
         url: '/token',
         initialize: function initialize() {
-            this.fetch();
+            console.log('Home model init');    
         }
     }),
 
     Login: Backbone.Model.extend({
         url: '/token',
         initialize: function initialize() {
-            if(!this.get('csrfToken')) {
-                this.fetch();
-            }
+            console.log('Login model init');
         }
     }),
 
@@ -13977,7 +13975,7 @@ var models = {
                 type: 'POST',
                 beforeSend: function(xhr) {
                     // Set the CSRF Token in the header for security
-                    var token = $('.app-container').data('token');
+                    var token = $('body').attr('data-token');
                     if (token) xhr.setRequestHeader('X-CSRF-Token', token);
                 },
                 data:  JSON.stringify( _.omit(opts, 'method') ),
@@ -14379,7 +14377,7 @@ views = {
     
     }),
 
-    Home : Backbone.View.extend({
+    Home: Backbone.View.extend({
         
         $container : (function() {
             return this.$ && this.$('.app-container');
@@ -14396,14 +14394,21 @@ views = {
         render: function render() {
             this.$el.html(this.template({}));
             this.$container.html('').append(this.$el);
-            if(!this.$container.data('token')) {
-                this.$container.data('token', this.model.get('csrfToken'));
-            }
         },
         
         initialize: function initialize(){
-            var render = _.bind(this.render, this);
-            this.model.on('change', render);
+            var setToken = _.bind(function(token) {
+                $('body').attr('data-token', token);
+            }, this);
+   
+            this.render();
+            if(!$('body').attr('data-token')) {
+                this.model.fetch({
+                    success: function success(model, response, options) {
+                        setToken(response.csrfToken);
+                    }
+                });
+            }
         }
 
     }),
@@ -14428,11 +14433,18 @@ views = {
         },
 
         initialize : function initialize(){
-            //debugger;
-            if(this.model.get('csrfToken')) {
-                this.model.on('change', this.render);
-            } else {
-                this.render();
+            var setToken = _.bind(function(token) {
+                $('body').attr('data-token', token);
+            }, this);
+            
+            this.render();
+
+            if(!$('body').attr('data-token')) {
+                this.model.fetch({
+                    success: function success(model, response, options) {
+                        setToken(response.csrfToken);
+                    }
+                });
             }
             
             session.on('change:logged_in',function(arg) {
@@ -14507,7 +14519,6 @@ views = {
         
         onSignupAttempt: function onSignupAttempt(evt){
             if(evt) evt.preventDefault();
-            //debugger;
             if(this.$("#signup-form").parsley('validate')){
                     session.signup({
                         username: this.$("#signup-username-input").val(),

@@ -23,16 +23,14 @@ var models = {
     Home: Backbone.Model.extend({
         url: '/token',
         initialize: function initialize() {
-            this.fetch();
+            console.log('Home model init');    
         }
     }),
 
     Login: Backbone.Model.extend({
         url: '/token',
         initialize: function initialize() {
-            if(!this.get('csrfToken')) {
-                this.fetch();
-            }
+            console.log('Login model init');
         }
     }),
 
@@ -125,7 +123,7 @@ var models = {
                 type: 'POST',
                 beforeSend: function(xhr) {
                     // Set the CSRF Token in the header for security
-                    var token = $('.app-container').data('token');
+                    var token = $('body').attr('data-token');
                     if (token) xhr.setRequestHeader('X-CSRF-Token', token);
                 },
                 data:  JSON.stringify( _.omit(opts, 'method') ),

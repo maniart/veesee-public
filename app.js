@@ -14,16 +14,15 @@ var express = require('express')
   , bcrypt = require('bcrypt')
   , mongoose = require('mongoose')
   
-  
   // custom modules
   , api = require('./routes/api')
   , home = require('./routes/home')
   , auth = require('./routes/auth')  
+  
   // app
   , app = express();
 
 // middlewares
-
 app.use(cookieParser('123foracheaperprice', {}));
 app.use(session({
     secret: 'buyingbetterproduce321',
@@ -39,7 +38,6 @@ app.use(bodyParser.urlencoded({
 app.use(compression({
   threshold: 512
 }));
-
 app.use(express.static(path.join(__dirname, 'public')));
 
 // routes

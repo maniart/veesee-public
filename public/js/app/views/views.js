@@ -266,7 +266,7 @@ views = {
     
     }),
 
-    Home : Backbone.View.extend({
+    Home: Backbone.View.extend({
         
         $container : (function() {
             return this.$ && this.$('.app-container');
@@ -283,14 +283,21 @@ views = {
         render: function render() {
             this.$el.html(this.template({}));
             this.$container.html('').append(this.$el);
-            if(!this.$container.data('token')) {
-                this.$container.data('token', this.model.get('csrfToken'));
-            }
         },
         
         initialize: function initialize(){
-            var render = _.bind(this.render, this);
-            this.model.on('change', render);
+            var setToken = _.bind(function(token) {
+                $('body').attr('data-token', token);
+            }, this);
+   
+            this.render();
+            if(!$('body').attr('data-token')) {
+                this.model.fetch({
+                    success: function success(model, response, options) {
+                        setToken(response.csrfToken);
+                    }
+                });
+            }
         }
 
     }),
@@ -315,11 +322,18 @@ views = {
         },
 
         initialize : function initialize(){
-            //debugger;
-            if(this.model.get('csrfToken')) {
-                this.model.on('change', this.render);
-            } else {
-                this.render();
+            var setToken = _.bind(function(token) {
+                $('body').attr('data-token', token);
+            }, this);
+            
+            this.render();
+
+            if(!$('body').attr('data-token')) {
+                this.model.fetch({
+                    success: function success(model, response, options) {
+                        setToken(response.csrfToken);
+                    }
+                });
             }
             
             session.on('change:logged_in',function(arg) {
@@ -394,7 +408,6 @@ views = {
         
         onSignupAttempt: function onSignupAttempt(evt){
             if(evt) evt.preventDefault();
-            //debugger;
             if(this.$("#signup-form").parsley('validate')){
                     session.signup({
                         username: this.$("#signup-username-input").val(),
