@@ -66,13 +66,17 @@ router.post('/signup', function(req, res) {
             res.json({ error: 'Username has been taken.', field: 'username' }); 
         
         } else {
-           // Set the user cookies and return the cleansed user data
-            //console.log(user);
-            console.log('>>>>>>>>>>> user omit: ',  _.omit(user, ['password', 'auth_token']));
-            
-            res.cookie('user_id', user._id, { signed: true, maxAge: config.cookieMaxAge  });
-            res.cookie('auth_token', user.auth_token, { signed: true, maxAge: config.cookieMaxAge  });
-            res.json({ user: _.omit(user, ['password', 'auth_token']) });    
+            // Set the user cookies and return the cleansed user data
+            console.log('user: ', _.omit(user.toObject(), ['password', 'auth_token']) ); 
+            res.cookie('user_id', user._id, {
+                signed: true,
+                maxAge: config.cookieMaxAge  
+            });
+            res.cookie('auth_token', user.auth_token, { 
+                signed: true, 
+                maxAge: config.cookieMaxAge  
+            });
+            res.json({ user: _.omit(user.toObject(), ['password', 'auth_token']) });    
         }
     });
 });
