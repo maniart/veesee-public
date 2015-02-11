@@ -15,21 +15,18 @@ var express = require('express')
   , User = mongoose.model('User');
 
 router.get('/', function(req, res) {
-    User.find({
-        id: req.signedCookies.user_id,
-        auth_token: req.signedCookies.auth_token
-    }, function(err, user) {
-        if(err) {
-            res.json({ error: 'Error retrieving user.'});
-        } else {
-            if(user){
-                res.json({ user: _.omit(user, ['password', 'auth_token']) });   
-            } else {  
-                res.json({ error: "Client has no valid login cookies."  });   
-            }    
-        }
-        
-    });
+    User
+        .find({
+            _id: req.signedCookies.user_id,
+            auth_token: req.signedCookies.auth_token   
+        }, 'username', function(err, user) {
+            if(err) {
+                res.json({ error: "Client has no valid login cookies."  }); 
+            } else {
+                console.log(_.omit(user, ['password', 'auth_token']));
+                res.json({ user: _.omit(user, ['password', 'auth_token']) });
+            }
+        });
 });
 
 router.post('/login', function(req, res) {
@@ -42,7 +39,7 @@ router.post('/login', function(req, res) {
                 res.cookie('user_id', user.id, {signed: true, maxAge: config.cookieMaxAge});
                 res.cookie('auth_token', user.auth_token, {signed: true, maxAge: config.cookieMaxAge});
                 // correct credentials, return the user object
-                res.json({user: _.omit(user, ['password', 'auth_token'])});
+                res.json({user: _.omit(user.toObject(), ['password', 'auth_token'])});
             } else {
                 res.json({error: 'Invalid username or password'});
             }

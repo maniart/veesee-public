@@ -14070,10 +14070,14 @@ Router = Backbone.Router.extend({
 
         // Start the backbone routing once we have captured a user's auth status
         complete: function(one, two, three){
-
-            Backbone.history.start({pushState: false});
-            console.log('checkAuth', one, two, three);
-
+          Backbone.history.start({pushState: false});
+          console.log('complete');
+        },
+        error: function error() {
+          console.log('error', arguments);
+        }, 
+        success: function success() {
+          console.log('success', arguments);
         }
     });
                         
