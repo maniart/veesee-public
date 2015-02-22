@@ -19,61 +19,93 @@ router.get('/', function(req, res) {
         .find({
             _id: req.signedCookies.user_id,
             auth_token: req.signedCookies.auth_token   
-        }, 'username', function(err, user) {
+        }, 'email', function(err, user) {
             if(err) {
-                res.json({ error: "Client has no valid login cookies."  }); 
+                res.json({
+                    error: 'Client has no valid login cookies.'
+                }); 
             } else {
-                console.log(_.omit(user, ['password', 'auth_token']));
-                res.json({ user: _.omit(user, ['password', 'auth_token']) });
+                console.log('>> auth.js >> / >> user:', user);
+                if(user.length) {
+                    res.json({
+                        user: user
+                    });
+                } else {
+                    res.json({
+                        message: 'User is not logged in.'
+                    });
+                }
             }
         });
 });
 
 router.post('/login', function(req, res) {
-    console.log('>>>  post /auth/login');
-    User.find({
-        username: req.body.username
+    function onErr(err, callback) {
+        mongoose.connection.close();
+        callback(err);
+    }
+    
+    User.findOne({
+        email: req.body.email
     }, function(err, user) {
         if(user) {
+            // Compare the POSTed password with the encrypted db password
             if(bcrypt.compareSync(req.body.password, user.password)) {
-                res.cookie('user_id', user.id, {signed: true, maxAge: config.cookieMaxAge});
-                res.cookie('auth_token', user.auth_token, {signed: true, maxAge: config.cookieMaxAge});
+                res.cookie('veesee_user_id', user._id, {
+                    signed: true, 
+                    maxAge: config.cookieMaxAge
+                });
+                res.cookie('veesee_auth_token', user.auth_token, {
+                    signed: true, 
+                    maxAge: config.cookieMaxAge
+                });
                 // correct credentials, return the user object
-                res.json({user: _.omit(user.toObject(), ['password', 'auth_token'])});
+                console.log('logged in. sending this', _.omit(user.toObject(), ['password', 'auth_token']));
+                res.json({
+                    user: _.omit(user.toObject(), ['password', 'auth_token'])
+                });
             } else {
-                res.json({error: 'Invalid username or password'});
+                res.json({
+                    error: 'Invalid email or password'
+                });
             }
         } else {
-            res.json({error: 'Username does not exist'});
+            res.json({
+                error: 'Email does not exist'
+            });
         }
     });
 });
 
 router.post('/signup', function(req, res) {
-    console.log('>>>  post /auth/signup');
+    console.log('>>>  post /auth/signup', req.body);
     new User({
-        username: req.body.username,
+        email: req.body.email,
         //name: req.body.name,
         password: bcrypt.hashSync(req.body.password, 8),
         auth_token: bcrypt.genSaltSync(8)
     }).save(function(err, user) {
         if(err) {
-           console.log('err - config: ', config);
-
-            res.json({ error: 'Username has been taken.', field: 'username' }); 
+            res.json({
+                error: 'There is already an account with this Email.', 
+                field: 'email',
+                err: err
+            }); 
         
         } else {
             // Set the user cookies and return the cleansed user data
             console.log('user: ', _.omit(user.toObject(), ['password', 'auth_token']) ); 
-            res.cookie('user_id', user._id, {
+            res.cookie('veesee_user_id', user._id, {
                 signed: true,
                 maxAge: config.cookieMaxAge  
             });
-            res.cookie('auth_token', user.auth_token, { 
+            res.cookie('veesee_auth_token', user.auth_token, { 
                 signed: true, 
                 maxAge: config.cookieMaxAge  
             });
-            res.json({ user: _.omit(user.toObject(), ['password', 'auth_token']) });    
+            res.json({
+                user: _.omit(user.toObject(), ['password', 'auth_token']) 
+            });    
         }
     });
 });

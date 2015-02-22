@@ -1,16 +1,17 @@
 /**
  * @module views
+ * Describes all view classes.
 */
 
 // keeping the `var` declaration due to https://gist.github.com/maniart/4e7d3395ce0e55f2e67d
 var fs = require('fs');
 var $ = require('jquery')/*(window)*/
   , Backbone = require('backbone')
+  , _ = require('underscore')
+  , parsley = require('../../thirdparty/parsley.min.js')
   , models = require('../models/models.js')
   , session = require('../models/session.js')
   , collections = require('../collections/collections.js')
-  , _ = require('underscore')
-  , parsley = require('../../thirdparty/parsley.min.js')
   , templates = {
         home: fs.readFileSync(__dirname + '/../templates/home.html'),
         login: fs.readFileSync(__dirname + '/../templates/login.html'),
@@ -324,10 +325,17 @@ views = {
         initialize : function initialize(){
             var setToken = _.bind(function(token) {
                 $('body').attr('data-token', token);
-            }, this);
+            }, this)
+              , render = _.bind(this.render, this)
+              , self = this;
             
             this.render();
+            this.model.on('change', function() {
+                render();
+                console.log('Session changed', this.changedAttributes());
 
+            });
+            
             if(!$('body').attr('data-token')) {
                 this.model.fetch({
                     success: function success(model, response, options) {
@@ -337,16 +345,10 @@ views = {
             }
             
             session.on('change:logged_in',function(arg) {
-                console.log('and we are logged in!');
+                console.log('change:logged_in', arg);
             });
             
         },
-        
-        toggleForms : function toggleForms(event) {
-            event.preventDefault();
-            this.$('.login, .signup').toggle();
-        },
-        
         events : {
             'click .js-show-signup'                 : 'toggleForms',
             'click .js-show-login'                  : 'toggleForms',
@@ -355,6 +357,14 @@ views = {
             'keyup #login-password-input'           : 'onPasswordKeyup',
             'keyup #signup-password-confirm-input'  : 'onConfirmPasswordKeyup'
         },
+
+        toggleForms : function(event) {
+            
+            event.preventDefault();
+            this.$('.login, .signup').toggle();
+        },
+        
+        
 
         // Allow enter press to trigger login
         onPasswordKeyup: function onPasswordKeyup(evt){
@@ -386,7 +396,7 @@ views = {
 
             if(this.$("#login-form").parsley('validate')){
                     session.login({
-                        username: this.$("#login-username-input").val(),
+                        email: this.$("#login-email-input").val(),
                         password: this.$("#login-password-input").val()
                 }, {
                     success: function(mod, res){
@@ -394,9 +404,7 @@ views = {
 
                     },
                     error: function(err){
-                        console.log("ERROR", err);
                         console.log('Bummer dude!', err.error, 'alert-danger'); 
-                        //app.showAlert('Bummer dude!', err.error, 'alert-danger'); 
                     }
                 });
             } else {
@@ -410,9 +418,8 @@ views = {
             if(evt) evt.preventDefault();
             if(this.$("#signup-form").parsley('validate')){
                     session.signup({
-                        username: this.$("#signup-username-input").val(),
+                        email: this.$("#signup-email-input").val(),
                         password: this.$("#signup-password-input").val(),
-                        name: this.$("#signup-name-input").val()
                 }, {
                     success: function(mod, res){
                         console.log("SUCCESS", mod, res);

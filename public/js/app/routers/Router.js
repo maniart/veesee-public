@@ -25,20 +25,18 @@ Router = Backbone.Router.extend({
     initialize: function initialize() {
         
         session.checkAuth({
-
-        // Start the backbone routing once we have captured a user's auth status
-        complete: function(one, two, three){
-          Backbone.history.start({pushState: false});
-          console.log('complete');
-        },
-        error: function error() {
-          console.log('error', arguments);
-        }, 
-        success: function success() {
-          console.log('success', arguments);
-        }
-    });
-                        
+          // Start the backbone routing once we have captured a user's auth status
+          complete: function(mode, res){
+            console.log('complete', arguments);
+          },
+          error: function error() {
+            console.log('error', arguments);
+          }, 
+          success: function success() {
+            console.log('success', arguments);
+          }
+        });
+        Backbone.history.start({pushState: false});                        
         console.log('session: ', session);
     },
     
