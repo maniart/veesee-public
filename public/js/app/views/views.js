@@ -343,13 +343,13 @@ views = {
                     }
                 });
             }
-            
-            session.on('change:logged_in',function(arg) {
-                console.log('change:logged_in', arg);
-            });
+            debugger;
+            session.on('change:logged_in', this.onLoginStatusChange);
             
         },
         events : {
+            'click .logout-account'                 : 'onLogout',
+            'click .delete-account'                 : 'onDeleteAccount',
             'click .js-show-signup'                 : 'toggleForms',
             'click .js-show-login'                  : 'toggleForms',
             'click #login-btn'                      : 'onLoginAttempt',
@@ -364,7 +364,24 @@ views = {
             this.$('.login, .signup').toggle();
         },
         
-        
+        onLoginStatusChange: function onLoginStatusChange() {
+            if(session.get('logged_in')) {
+                console.log('You are logged in now.');
+            } else {
+                console.log('Bye!');
+            }
+        },
+
+        onLogout: function onLogout(evt) {
+            debugger;
+            evt.preventDefault();
+            session.logout({});
+        },
+
+        onDeleteAccount: function onDeleteAccount(evt) {
+            evt.preventDefault();
+            session.removeAccount({});
+        },
 
         // Allow enter press to trigger login
         onPasswordKeyup: function onPasswordKeyup(evt){

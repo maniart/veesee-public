@@ -48,7 +48,7 @@ var models = {
             user_id: ''
         },
 
-        initialize: function(){
+        initialize: function initialize(){
             // Singleton user object
             // Access or listen on this throughout any module with app.session.user
             this.user = new models.User({});
@@ -69,24 +69,24 @@ var models = {
             var self = this;
 
             this.fetch({ 
-                success: function(mod, res){
-                    if(!res.error && res.user){
+                success: function(model, response, options){
+                    if(!response.error && response.user){
                         self
-                            .updateSessionUser(res.user)
+                            .updateSessionUser(response.user)
                             .set({ logged_in : true });
                         if('success' in callback) {
-                            callback.success(mod, res);
+                            callback.success(model, response);
                         }    
                     } else {
                         self.set({ logged_in : false });
                         if('error' in callback) {
-                            callback.error(mod, res);
+                            callback.error(model, response);
                         }    
                     }
                 }, error:function(mod, res){
                     self.set({ logged_in : false });
                     if('error' in callback) {
-                        callback.error(mod, res);
+                        callback.error(model, response);
                     }    
                 }
             }).complete( function(){
@@ -120,7 +120,6 @@ var models = {
                 success: function(res){
                     if( !res.error ){
                         if(_.indexOf(['login', 'signup'], opts.method) !== -1){
-                            console.log('postAuth > success: ', res.user.email);
                             self
                                 .updateSessionUser(res.user || {})
                                 .set({
@@ -171,11 +170,7 @@ var models = {
 
     }),
 
-    Results: Backbone.Model.extend({
-        initialize : function() {
-            console.warn('Results page model');
-        }
-    })
+    Results: Backbone.Model.extend({})
 
 };
 

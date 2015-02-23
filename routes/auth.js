@@ -14,18 +14,17 @@ var express = require('express')
   , session = require('express-session')
   , User = mongoose.model('User');
 
+// Check Auth route
 router.get('/', function(req, res) {
-    User
-        .find({
-            _id: req.signedCookies.user_id,
-            auth_token: req.signedCookies.auth_token   
+    User.find({
+            _id: req.signedCookies.veesee_user_id,
+            auth_token: req.signedCookies.veesee_auth_token   
         }, 'email', function(err, user) {
             if(err) {
                 res.json({
                     error: 'Client has no valid login cookies.'
                 }); 
             } else {
-                console.log('>> auth.js >> / >> user:', user);
                 if(user.length) {
                     res.json({
                         user: user
@@ -39,12 +38,8 @@ router.get('/', function(req, res) {
         });
 });
 
+// Login route
 router.post('/login', function(req, res) {
-    function onErr(err, callback) {
-        mongoose.connection.close();
-        callback(err);
-    }
-    
     User.findOne({
         email: req.body.email
     }, function(err, user) {
@@ -60,7 +55,6 @@ router.post('/login', function(req, res) {
                     maxAge: config.cookieMaxAge
                 });
                 // correct credentials, return the user object
-                console.log('logged in. sending this', _.omit(user.toObject(), ['password', 'auth_token']));
                 res.json({
                     user: _.omit(user.toObject(), ['password', 'auth_token'])
                 });
@@ -77,11 +71,10 @@ router.post('/login', function(req, res) {
     });
 });
 
+// Signup route
 router.post('/signup', function(req, res) {
-    console.log('>>>  post /auth/signup', req.body);
     new User({
         email: req.body.email,
-        //name: req.body.name,
         password: bcrypt.hashSync(req.body.password, 8),
         auth_token: bcrypt.genSaltSync(8)
     }).save(function(err, user) {
@@ -91,10 +84,8 @@ router.post('/signup', function(req, res) {
                 field: 'email',
                 err: err
             }); 
-        
         } else {
             // Set the user cookies and return the cleansed user data
-            console.log('user: ', _.omit(user.toObject(), ['password', 'auth_token']) ); 
             res.cookie('veesee_user_id', user._id, {
                 signed: true,
                 maxAge: config.cookieMaxAge  
@@ -110,18 +101,18 @@ router.post('/signup', function(req, res) {
     });
 });
 
+// Logout route
 router.post('/logout', function(req, res) {
-    console.log('>>>  route /auth/logout');
-    res.clearCookie('user_id');
-    res.clearCookie('auth_token');
-    res.json({ success: "User successfully logged out." });
+    res.clearCookie('veesee_user_id');
+    res.clearCookie('veesee_auth_token');
+    res.json({ success: 'User successfully logged out.' });
 });
 
+// Remove account route
 router.post('/remove_account', function(req, res) {
-    console.log('>>>  route /auth/remove_account');
     User.remove({
-        id: require.signedCookies.user_id,
-        auth_token: req.signedCookies.auth_token
+        id: req.signedCookies.veesee_user_id,
+        auth_token: req.signedCookies.veesee_auth_token
     }, function(err){
         if(err) {
             res.json({ error: 'Error while trying to delete user.' }); 

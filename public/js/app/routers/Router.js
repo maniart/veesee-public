@@ -26,14 +26,14 @@ Router = Backbone.Router.extend({
         
         session.checkAuth({
           // Start the backbone routing once we have captured a user's auth status
-          complete: function(mode, res){
-            console.log('complete', arguments);
+          complete: function(model, response, options){
+            console.log('checkAuth complete. model:', model, ' response:', response, ' options: ', options);
           },
-          error: function error() {
-            console.log('error', arguments);
+          error: function error(model, response, options) {
+            console.log('checkAuth error. model:', model, ' response:', response, ' options: ', options);
           }, 
-          success: function success() {
-            console.log('success', arguments);
+          success: function success(model, response, options) {
+            console.log('checkAuth success. model:', model, ' response:', response, ' options: ', options);
           }
         });
         Backbone.history.start({pushState: false});                        
@@ -48,6 +48,7 @@ Router = Backbone.Router.extend({
 
     login: function login() {
         console.log('login route');
+        debugger;
         var loginModel = new models.Login({})
           , loginView = new views.Login({model: loginModel});
     },
