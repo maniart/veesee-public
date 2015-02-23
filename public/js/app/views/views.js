@@ -343,7 +343,6 @@ views = {
                     }
                 });
             }
-            debugger;
             session.on('change:logged_in', this.onLoginStatusChange);
             
         },
@@ -373,7 +372,6 @@ views = {
         },
 
         onLogout: function onLogout(evt) {
-            debugger;
             evt.preventDefault();
             session.logout({});
         },
