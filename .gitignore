@@ -6,7 +6,7 @@ public/reports/
 Designs/
 
 # Logs
-logs
+logs/*
 *.log
 
 # Runtime data
