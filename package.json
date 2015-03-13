@@ -26,7 +26,6 @@
     "brfs": "^1.2.0",
     "browserify": "~5.10.1",
     "browserify-shim": "^3.8.2",
-    "express": "3.x",
     "grunt": "~0.4.1",
     "grunt-bower-task": "0.4.0",
     "grunt-browserify": "^3.2.1",
