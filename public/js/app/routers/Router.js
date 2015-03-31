@@ -1,54 +1,41 @@
-/**
-    @module Router
-*/
+/* @module BaseRouter */
 
+
+/* imports */
 var $ = require('jquery')(window)
   , Backbone = require('backbone')
-  , models = require('../models/models.js')
-  , session = require('../models/session.js')
-  , views = require('../views/views.js')
-  , collections = require('../collections/collections.js')
-  , session = require('../models/session.js')
-  , Router;
+
+
+/* modules */
+
+  , BaseRouter = require('./BaseRouter')
+  , home = require('../controllers/homeController')
+  , about = require('../controllers/aboutController')
+  , login = require('../controllers/loginController')
+  , dashboard = require('../controllers/dashboardController');
+
 
 Backbone.$ = window.$;
 
-Router = Backbone.Router.extend({
 
-    routes: {
-        ''      : 'home',
-        'login' : 'login',
-        'app'   : 'app'
-        
-    },
+/* exports */
 
-    initialize: function initialize() {
-        
-        session.checkAuth({
-          // Start the backbone routing once we have captured a user's auth status
-          complete: function(model, response, options){
-            console.log('checkAuth complete. model:', model, ' response:', response, ' options: ', options);
-          },
-          error: function error(model, response, options) {
-            console.log('checkAuth error. model:', model, ' response:', response, ' options: ', options);
-          }, 
-          success: function success(model, response, options) {
-            console.log('checkAuth success. model:', model, ' response:', response, ' options: ', options);
-          }
-        });
-        Backbone.history.start({pushState: false});                        
-        console.log('session: ', session);
-    },
+module.exports = BaseRouter.extend({
+
+  routes: {
+    ''          : home,
+    'about'     : about,
+    'login'     : login,
+    'dashboard' : dashboard
+  }
     
-    home: function home() {
-        console.log('home route');
-        var homeModel = new models.Home({})
-          , homeView = new views.Home({model: homeModel});
-    },
+
+
+  /*
+  dashboard: dashboard
 
     login: function login() {
         console.log('login route');
-        debugger;
         var loginModel = new models.Login({})
           , loginView = new views.Login({model: loginModel});
     },
@@ -65,6 +52,6 @@ Router = Backbone.Router.extend({
         });
     } 
 
-});
+    */
 
-module.exports = Router;
+});

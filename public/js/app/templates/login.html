@@ -1,3 +1,6 @@
+<div class="under-construction">    
+</div>
+
 <header class="global-header">
     <nav class="navbar navbar-fixed-top global-nav">
         <div class="container">
@@ -5,14 +8,11 @@
                 <img alt="VeeSee" src="img/logo.png">
             </a>
             <ul class="nav navbar-nav navbar-right">
-                <li>
-                    <a class="highlight" href="#app">Launch</a>
+                <li class="active">
+                    <a class="btn btn-default" role="button" href="#login">Login</a>
                 </li>
                 <li>
-                    <a href="/login">Login</a>
-                </li>
-                <li>
-                    <a href="/about">About</a>
+                    <a class="btn"  href="#about">About</a>
                 </li>
             </ul><!-- .nav.navbar-nav.navbar-right -->
         </div><!-- .container -->
@@ -21,75 +21,63 @@
 
 <div class="container above-fold full-height">
     <div class="row login-container">
-        <div class="col-md-7">
-            <div class="row">
-                <div class="col-md-12 well well-lg text-center login">
-                    <h1>Login</h1>
-                    <div class="height:50px;">
-                        <ul id="login-errors" class="parsley-error-list"></ul>
+        
+        <div class="col-md-4">
+<!--             <h1 class="page-title">Login</h1>
+ -->            <div class="height:50px;">
+                <ul id="login-errors" class="parsley-error-list"></ul>
+            </div>
+            <form class="form-horizontal login-form">
+                <div class="form-group">
+                    <label for="inputEmail3" class="col-sm-2 control-label">Email</label>
+                    <div class="col-sm-10">
+                        <input type="email" class="form-control" id="inputEmail3" placeholder="Email">
                     </div>
-
-                    <form id="login-form" class="form" data-validate="parsley">
-                        <fieldset>
-                            <div class="control-group">
-                                <div class="controls">
-                                    <input type="email" id="login-email-input" name="email" placeholder="Email" value="" data-required="true" data-notblank="true">
-                                    <span class="help-block"></span>
-                                </div><!-- .controls -->
-                            </div><!-- .control-group -->
-                            <div class="control-group mb20">
-                                <div class="controls">
-                                    <input class="input-medium" type="password" id="login-password-input" placeholder="Password" name="user_password" value="" data-required="true" data-notblank="true" data-rangelength="[5,25]">
-                                    <span class="help-block"></span>
-                                </div><!-- .controls -->
-                            </div><!-- .control-group -->
-                            <a href="#" id="login-btn" class="btn btn-primary btn-lg" data-bypass="">Login</a>
-                            
-                            <a class="show-signup js-show-signup" href="">Not a member? Signup!</a>
-
-                        </fieldset>
-                    </form><!-- .login-form -->
-                </div><!-- .col-md-12 --> 
-                <div class="col-md-12 well well-lg text-center signup">
-                    <h1>Signup</h1>
-                    <div class="height:50px;">
-                        <ul id="signup-errors" class="parsley-error-list"></ul>
+                </div>
+                <div class="form-group">
+                    <label for="inputPassword3" class="col-sm-2 control-label">Password</label>
+                    <div class="col-sm-10">
+                        <input type="password" class="form-control" id="inputPassword3" placeholder="Password">
                     </div>
-                    <form id="signup-form" class="form" data-validate="parsley">
-                        <fieldset>
-                            <div class="control-group">
-                                <div class="controls">
-                                    <input type="email" id="signup-email-input" name="email" placeholder="Email" value="" data-required="true" data-notblank="true">
-                                    <span class="help-block"></span>
-                                </div>
-                            </div>
-                            <div class="control-group">
-                                <div class="controls">
-                                    <input class="input-medium" type="password" id="signup-password-input" placeholder="Password" name="user_password" value="" data-required="true" data-notblank="true" data-rangelength="[5,25]">
-                                    <span class="help-block"></span>
-                                </div>
-                            </div>
-                            <div class="control-group mb20">
-                                <div class="controls">
-                                    <input class="input-medium" type="password" id="signup-password-confirm-input" placeholder="Confirm Password" name="user_password" value="" data-required="true" data-notblank="true" data-rangelength="[5,25]" data-equalto="#signup-password-input">
-                                    <span class="help-block"></span>
-                                </div>
-                            </div>
-                            <a href="#" id="signup-btn" class="btn btn-primary btn-lg" data-bypass="">Signup</a>
-                            <a class="show-login js-show-login" href="#">Already a member? Login.</a>
-                        </fieldset>
-                    </form>
-                </div><!-- .col-md-12 -->  
-            </div><!-- .row -->            
-        </div><!-- .col-md-12 -->
-        <div class="col-md-5 ">
-            <h1 class="">Login</h1>     
-            <a class="logout-account" href="">Logout</a>
-            <a class="delete-account" href="">Delete Account</a>
-            <p>
-                Lorem ipsum dolor sit amet, consectetur adipiscing elit. Etiam dignissim lobortis nisi, ac egestas nibh faucibus interdum. Morbi sed lacus nulla. Quisque volutpat dolor nec magna faucibus porttitor. Morbi at neque nulla. Aliquam congue mattis ante sit amet mattis. In hac habitasse platea dictumst. Vestibulum auctor ex a laoreet finibus. In nec libero in sem iaculis dignissim et id mi. Pellentesque auctor ex vel mattis tincidunt. Nullam non magna feugiat, feugiat sapien et, placerat neque. Ut aliquet elit tortor, rutrum euismod augue ornare et. In ante mi, egestas nec augue nec, tristique mattis justo. Ut faucibus quam et nisl mattis, nec porttitor arcu malesuada. Mauris a ex ut orci blandit ultricies eget a dolor. Duis consectetur nulla nec pretium blandit.
-            </p>           
-        </div><!-- .col-md-12 -->
+                </div>
+                <div class="form-group">
+                    <div class="col-sm-10">
+                        <div class="checkbox">
+                            <label>
+                                <input type="checkbox"> Remember me
+                            </label>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="col-sm-10">
+                        <button type="submit" class="btn btn-default">Log in</button>
+                        <button type="button" class="btn btn-link">Sign up</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+
+        <div class="col-md-8 blurb">
+            <h3 class="copy">
+                Create an account to: 
+            </h3>
+            <h3 class="copy">
+                Keep track of your valuations 
+            </h3>
+            <h3 class="copy">
+                Manage, download and share your data
+            </h3>
+            <h3 class="copy">
+                Upload pitch decks, and 
+            </h3>
+            <h3 class="copy">    
+                Breeze through valuations!
+            </h3>
+        </div>
+            
+
+        
     </div><!-- .row --> 
     
     <footer class="global-footer bottom">

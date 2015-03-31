@@ -1,5 +1,12 @@
-var _ = require('underscore');
-var $ = require('jquery');
-var Router = require('../app/routers/Router.js');
+/* @module app */
 
-new Router();
+
+/* modules */
+
+require('../app/routers/Router').create()
+
+
+/* init */
+
+
+

@@ -1,5 +1,15 @@
+/* @module db */
+
+
+/* imports */
+
 var mongoose = require('mongoose')
   , config = require('./config')
+  , debug = require('debug')('veesee')
+  
+
+/* vars */
+
   , User = new mongoose.Schema({
       id: Number,
       email: String,
@@ -7,28 +17,32 @@ var mongoose = require('mongoose')
       name: String,
       auth_token: String,
       password: String
-    });
+    })
+  , options = {
+      server: {
+        socketOptions: { 
+          keepAlive: 1 
+        } 
+      }
+    }
+  , _log = process.env.DEBUG ? debug : console.log;
 
+
+/* settings */
+
+// - create model
 mongoose.model('User', User);
+// - debug
 mongoose.set('debug', true);
-
-// Connect to mongodb
-var connect = function () {
-  var options = {
-    server: {
-      socketOptions: {
-       keepAlive: 1 
-     } 
-   } 
- };
+// - connect
+mongoose.connect(config.MONGODB_URL, options);
+// - error handling
+mongoose.connection.on('error', _log);
+// - retry
+mongoose.connection.on('disconnected', function() {
   mongoose.connect(config.MONGODB_URL, options);
-};
-
-connect();
-mongoose.connection.on('error', console.log);
-mongoose.connection.on('disconnected', connect);
-mongoose.connection.on('connected', function() {
-    console.log('mongoose connected');
 });
-
-
+// - connected
+mongoose.connection.on('connected', function() {
+    _log('db:conected');
+});

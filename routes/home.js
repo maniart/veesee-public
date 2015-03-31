@@ -1,15 +1,20 @@
-var express = require("express");
-var router = express.Router();
-var data = require("../data/data.json"),
-	csrf = require('csurf');
+/* @module home */
 
 
-router.get('/', function(req, res, next) {
+/* imports */
+
+var express = require("express")
+  , router = express.Router()
+  , data = require('../data/data.json')
+
+
+/* routes */
+
+router.get('/', function(req, res) {
 	res.json(data);
 });
 
-router.get('/token', function(req, res, next) {
-	res.json({ csrfToken: req.csrfToken() });
-});
+
+/* exports */
 
 module.exports = router;
