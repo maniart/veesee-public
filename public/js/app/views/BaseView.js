@@ -27,6 +27,7 @@ module.exports = Backbone.View.extend({
 		this.render()
 			.afterRender();
 		return this.trigger('view:initialized');
+	
 	},
 
 	beforeRender: function beforeRender() {
