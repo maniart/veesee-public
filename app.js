@@ -1,10 +1,14 @@
-    // imports
+/* @module app */
+
+
+/* imports */
+
 var express = require('express')
+  , _ = require('underscore')
   , path = require('path')
   , favicon = require('static-favicon')
   , logger = require('morgan')
   , bodyParser = require('body-parser')
-  , npid = require('npid')
   , fs = require('fs')
   , compression = require('compression')
   , debug = require('debug')('veesee')
@@ -14,99 +18,81 @@ var express = require('express')
   , bcrypt = require('bcrypt')
   , mongoose = require('mongoose')
   
-  // custom modules
+
+/* modules */
+
   , api = require('./routes/api')
   , home = require('./routes/home')
-  , auth = require('./routes/auth')  
-  
-  // app
+  , auth = require('./routes/auth')
+  , token = require('./routes/token')
+
+
+/* vars */
+
+  , server
+  , _log = process.env.DEBUG ? debug : console.log
+
+
+/* app */
+
   , app = express();
 
-// middlewares
-app.use(cookieParser('123foracheaperprice', {}));
+
+/* middlewares */
+
+// - populates req.signedCookies
+app.use(cookieParser('123foracheaperprice'));
+// - populates req.session, needed for CSRF
 app.use(session({
-    secret: 'buyingbetterproduce321',
-    resave: false,
-    saveUninitialized: true
+  secret: 'buyingbetterproduce321',
+  resave: false,
+  saveUninitialized: false
 }));
+// - CSRF token
 app.use(csrf());
+// - logger
 app.use(logger('dev'));
+// - parse application/json
 app.use(bodyParser.json());
+// - bodyparser, accepts any Type in `req.body`
 app.use(bodyParser.urlencoded({
   extended: true
 }));
+// - compression
 app.use(compression({
   threshold: 512
 }));
+// - static
 app.use(express.static(path.join(__dirname, 'public')));
+// - handle 404
+app.use(function(req, res) {
+  res.status(400);
+  res.redirect('/#404');
+});
+// - handle 500
+app.use(function(error, req, res, next) {
+  res.status(500);
+  res.redirect('/#500');
+});
 
-// routes
-app.use('/', home);
-app.use('/api', api);
-app.use('/auth', auth);
 
-// port
+/* routes */
+
+_([home, api, auth, token]).each(function(controller) {
+  var name = controller.name
+    , route = name === 'home' ? '/' : '/' + name;
+  
+  app.use(route, controller);
+});
+
+
+/* settings */
+
 app.set('port', process.env.PORT || 3030);
 
 
-/// catch 404 and forward to error handler
-app.use(function(req, res, next) {
-    var err = new Error('Not Found');
-    err.status = 404;
-    // respond with html page
-    if (req.accepts('html')) {
-        /*TODO: handle 404 errors here */
-        return;
-    }
+/* server  */
 
-    // respond with json
-    if (req.accepts('json')) {
-        res.send({ error: 'Not found' });
-        return;
-    }
-
-    // default to plain-text. send()
-    res.type('txt').send('Not found');
+server = app.listen(app.get('port'), function() {
+  _log('app on %d', server.address().port);
 });
-
-/// error handlers
-// if(app.get('env') === 'production') {
-//     /*TODO: fix this for launch */
-    
-//     try {
-//         var pid = npid.create('/var/run/pmfat.pid');
-//         pid.removeOnExit();
-//     } catch (err) {
-//         console.log('>> app.js - npmid error : ',err);
-//         process.exit(1);
-//     }
-    
-// }
-
-
-// development error handler
-// will print stacktrace
-// if (app.get('env') === 'development') {
-//     app.use(function(err, req, res, next) {
-//         res.status(err.status || 500);
-//         res.render('error', {
-//             message: err.message,
-//             error: err
-//         });
-//     });
-// }
-
-// production error handler
-// no stacktraces leaked to user
-// app.use(function(err, req, res, next) {
-//     res.status(err.status || 500);
-//     res.render('error', {
-//         message: err.message,
-//         error: {}
-//     });
-// });
-
-var server = app.listen(app.get('port'), function() {
-  console.log('VeeSee server listening on port ' + server.address().port)
-});
-

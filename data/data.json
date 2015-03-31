@@ -110,6 +110,7 @@
 		]
 		
 	},
+
 	{
 		"title" : "competetive advantage",
 		"category" : "competetive advantage",
@@ -121,6 +122,7 @@
 			"better core technology"
 		]
 	},
+
 	{
 		"title" : "traction",
 		"category" : "traction",
@@ -132,6 +134,7 @@
 			"six months of accelerating growth"
 		]
 	},
+
 	{
 		"title" : "distribution channel",
 		"category" : "distribution channel",
@@ -143,6 +146,5 @@
 			"multiple R&D, licensing, or supply chain partnership agreements"
 		]
 	}
-
 
 ]

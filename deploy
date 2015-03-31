@@ -1,0 +1,7 @@
+#!/bin/bash
+
+grunt prod
+git add .
+#TODO take commit message input
+git commit -m 'deploy'
+git push prod

@@ -4,6 +4,26 @@ body {
   margin: 0px;
   padding: 0px;
 }
+.under-construction {
+  background: rgba(253, 94, 99, 0.9);
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 9999;
+  width: 100%;
+  height: 100%;
+}
+.btn-primary {
+  background-color: #fd5e63;
+  border-color: #fd5e63;
+  -webkit-transition: background 0.1s ease;
+  -moz-transition: background 0.1s ease;
+  -o-transition: background 0.1s ease;
+  transition: background 0.1s ease;
+}
+.btn-primary:hover {
+  background-color: #fe9094;
+}
 html {
   box-sizing: border-box;
 }
@@ -29,10 +49,10 @@ html {
 }
 .global-header .navbar {
   background: rgba(255, 255, 255, 0.8);
-  min-height: 100px;
+  min-height: 80px;
 }
 .global-header .global-nav ul {
-  margin-top: 35px;
+  margin-top: 15px;
 }
 .global-header .global-nav li {
   margin-left: 10px;
@@ -41,9 +61,17 @@ html {
   color: #fd5e63;
   font-family: bebas_neuebook;
   font-size: 1.4em;
-  padding-top: 10px;
-  padding-bottom: 10px;
   letter-spacing: 2px;
+}
+.global-header .global-nav a.btn-primary {
+  color: white;
+}
+.global-header .global-nav a.btn-primary:hover {
+  background-color: #fe9094;
+  border-color: white;
+}
+.global-header .global-nav a.btn-default {
+  border-color: #fd5e63;
 }
 .global-header .global-nav .highlight {
   -webkit-border-radius: 3px;
@@ -56,10 +84,14 @@ html {
   background-color: #fd5e63;
 }
 .global-header .global-nav .nabvar-brand {
-  width: 71px;
-  height: 71px;
+  width: 60px;
+  height: 60px;
   display: inline-block;
-  margin-top: 5px;
+  margin-top: 10px;
+}
+.global-header .global-nav .nabvar-brand img {
+  width: 100%;
+  height: 100%;
 }
 .global-footer {
   color: #c8c8c8;
@@ -89,6 +121,62 @@ h3 {
   width: 100%;
   position: absolute;
 }
+.movie-container .video-js {
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  display: none;
+}
+.movie-container .vjs-default-skin .vjs-big-play-button {
+  display: none;
+}
+.movie-container .vjs-default-skin .vjs-play-progress {
+  background: #fd5e63;
+}
+.movie-container .vjs-default-skin .vjs-volume-level {
+  background: #fd5e63;
+}
+.learn-more {
+  font-size: 1em;
+  margin-top: 50px;
+  font-family: bebas_neuebook;
+}
+.learn-more,
+.learn-more a {
+  color: #fd5e63;
+  text-decoration: underline;
+}
+.learn-more .glyphicon {
+  font-size: .8em;
+  margin-left: 5px;
+}
+.scroll-below-fold {
+  display: block;
+  height: 25px;
+  width: 25px;
+  position: absolute;
+  bottom: 40px;
+  left: 50%;
+  color: white;
+  -webkit-transform: translateX(-50%);
+  -moz-transform: translateX(-50%);
+  -o-transform: translateX(-50%);
+  -ms-transform: translateX(-50%);
+  transform: translateX(-50%);
+}
+.scroll-below-fold:hover,
+.scroll-below-fold:focus,
+.scroll-below-fold:visited {
+  text-decoration: none;
+}
+.scroll-below-fold span {
+  color: white;
+  width: 100%;
+  height: 100%;
+  text-align: center;
+  display: block;
+  font-size: 1.5em;
+}
 .above-fold {
   padding-top: 80px;
 }
@@ -108,63 +196,53 @@ h3 {
 .first-title {
   line-height: .8;
   font-size: 4em;
-  border-bottom: 3px solid white;
 }
 .tagline {
   font-family: bitterregular;
   margin: 0;
-  letter-spacing: 4px;
-  font-size: 1.9em;
-  line-height: .7;
+  letter-spacing: 0;
+  font-size: 1.5em;
+  line-height: 1;
 }
 .play-movie {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 30px;
+  -webkit-transition: all 0.1s ease-out;
+  -moz-transition: all 0.1s ease-out;
+  -o-transition: all 0.1s ease-out;
+  transition: all 0.1s ease-out;
+  padding: 0 20px;
   display: inline-block;
   float: left;
   clear: both;
-  margin-top: 40px;
-  font-size: 2.5em;
+  margin-top: 50px;
+  font-size: 2em;
   letter-spacing: 1px;
   font-family: bebas_neuebook;
   text-transform: uppercase;
   color: white;
-  -webkit-transition: all 0.5s ease-in;
-  -moz-transition: all 0.5s ease-in;
-  -o-transition: all 0.5s ease-in;
-  transition: all 0.5s ease-in;
 }
 .play-movie:hover {
-  color: white;
-  text-decoration: underline;
-}
-.play-movie:hover .glyphicon-play {
-  margin-left: 15px;
-  color: white;
+  -webkit-transform: translateX(5px);
+  -moz-transform: translateX(5px);
+  -o-transform: translateX(5px);
+  -ms-transform: translateX(5px);
+  transform: translateX(5px);
+  text-decoration: none;
 }
 .play-movie:active,
 .play-movie:visited {
   color: white;
+  text-decoration: none;
 }
 .play-movie .glyphicon-play {
   float: right;
   font-size: .5em;
   line-height: 1.8;
   margin-left: 10px;
-  border: 2px solid white;
-  -webkit-border-radius: 50%;
-  -webkit-background-clip: padding-box;
-  -moz-border-radius: 50%;
-  -moz-background-clip: padding;
-  border-radius: 50%;
-  background-clip: padding-box;
-  width: 40px;
-  height: 40px;
   margin-top: 8px;
   padding-left: 10px;
   padding-top: 0;
-  -webkit-transition: all 0.3s ease-out;
-  -moz-transition: all 0.3s ease-out;
-  -o-transition: all 0.3s ease-out;
-  transition: all 0.3s ease-out;
   color: white;
 }
 .movie-screenshot {
@@ -180,7 +258,7 @@ h3 {
 h3.copy {
   color: #fd5e63;
   text-decoration: underline;
-  font-size: 2em;
+  font-size: 1.4em;
   display: inline-block;
   clear: both;
   float: left;
@@ -201,9 +279,38 @@ h3.copy.push-down {
 }
 .intro-text p {
   font-family: bitterregular;
+  font-size: .8em;
 }
 .signup {
   display: none;
+}
+.blurb {
+  margin-top: 90px;
+}
+.login-form {
+  margin-top: 95px;
+}
+.btn-default {
+  border-color: #ccc;
+}
+.btn-default:hover {
+  background-color: white;
+  border-color: #fd5e63;
+  color: #fd5e63;
+}
+.btn-link {
+  color: #333;
+}
+.btn-link:hover {
+  color: #fd5e63;
+}
+.control-label {
+  display: none;
+}
+.page-title {
+  ont-size: 3em;
+  font-family: bebas_neuebook;
+  color: #fd5e63;
 }
 body {
   -webkit-touch-callout: none;
@@ -374,4 +481,45 @@ h6 {
 .home .start:focus {
   background: #000;
   color: white;
+}
+.about-view {
+  min-height: 100%;
+  height: 100%;
+  width: 100%;
+  position: absolute;
+}
+.about-view .about-img {
+  width: 50%;
+  padding: 3px;
+  border: 1px solid #fd5e63;
+}
+.about-view .scroll-below-fold span {
+  color: #fd5e63;
+}
+.about-view .contact-info {
+  font-size: 1.1em;
+}
+.about-view .contact-info a {
+  color: #fd5e63;
+  display: block;
+}
+.about-view .about-veesee {
+  padding-top: 184px;
+}
+.about-view .about-veesee p {
+  padding-top: 40px;
+}
+.about-view .about-veesee h1 {
+  font-size: 3em;
+  font-family: bebas_neuebook;
+  color: #fd5e63;
+}
+.about-view .about-founders a {
+  color: #fd5e63;
+}
+.about-view .about-founders h2 {
+  text-decoration: underline;
+  font-size: 1.6em;
+  font-family: bebas_neuebook;
+  color: #fd5e63;
 }

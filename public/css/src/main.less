@@ -9,6 +9,23 @@ html, body {
 	margin: 0px;
 	padding: 0px;
 }
+.under-construction {
+	background: rgba(253, 94, 99, .9);
+	position: fixed;
+	top: 0;
+	left: 0;
+	z-index: 9999;
+	width: 100%;
+	height: 100%;
+}
+.btn-primary {
+	background-color: @color-red;
+	border-color: @color-red;
+	.transition(background .1s ease);
+	&:hover {
+		background-color: lighten(@color-red, 10%);
+	}
+}
 html {
   box-sizing: border-box;
 }
@@ -35,11 +52,11 @@ html {
 .global-header {
 	.navbar {
 		background: rgba(255,255,255,.8);
-		min-height: 100px;
+		min-height: 80px;
 	} 
 	.global-nav {
 		ul {
-			margin-top: 35px;
+			margin-top: 15px;
 		}
 		li {
 			margin-left: 10px;
@@ -48,9 +65,17 @@ html {
 			color: @color-red;
 			font-family: bebas_neuebook;
 			font-size: 1.4em;
-			padding-top: 10px;
-			padding-bottom: 10px;
 			letter-spacing: 2px;
+			&.btn-primary {
+				color: white;
+				&:hover {
+					background-color: lighten(@color-red, 10%);
+					border-color: white;
+				}
+			} 
+			&.btn-default {
+				border-color: @color-red;
+			}
 		}
 		.highlight {
 			.border-radius(3px);
@@ -58,10 +83,16 @@ html {
 			background-color: @color-red;
 		}
 		.nabvar-brand {
-			width: 71px;
-			height: 71px;
+			width: 60px;
+			height: 60px;
+
 			display: inline-block;
-			margin-top: 5px;
+			margin-top: 10px;
+
+			img {
+				width: 100%;
+				height: 100%;
+			}
 		}
 	}
 }
@@ -93,6 +124,62 @@ h1, h2, h3 {
 	width: 100%;
 	position: absolute;
 }
+.movie-container {
+	.video-js {
+		width: 100%;
+		height: 100%;
+		position: absolute;
+		display: none;
+	}
+	.vjs-default-skin .vjs-big-play-button {
+		display: none;
+	}
+	.vjs-default-skin .vjs-play-progress {
+		background: @color-red;
+	}
+	.vjs-default-skin .vjs-volume-level {
+		background: @color-red;
+	}
+
+}
+
+.learn-more {
+	font-size: 1em;
+	margin-top: 50px;
+	font-family: bebas_neuebook;
+	&, a {
+		color: @color-red;
+		text-decoration: underline;
+	}
+	.glyphicon {
+		font-size: .8em;
+		margin-left: 5px;
+	}
+}
+.scroll-below-fold {
+	display: block;
+	height: 25px;
+	width: 25px;
+	position: absolute;
+	bottom: 40px;
+	left: 50%;
+	color: white;
+	.transform(translateX(-50%));
+
+	&:hover, &:focus, &:visited {
+		text-decoration: none;
+	}
+
+}
+.scroll-below-fold span {
+	color: white;
+	width: 100%;
+	height: 100%;
+	text-align: center;
+	display: block;
+	font-size: 1.5em;
+}
+
 .above-fold {
 	padding-top: 80px;
 }
@@ -112,51 +199,45 @@ h1, h2, h3 {
 .first-title {
 	line-height: .8;
 	font-size: 4em;
-	border-bottom: 3px solid white;
 }
 .tagline {
 	font-family: bitterregular;
 	margin: 0;
-	letter-spacing: 4px;
-	font-size: 1.9em;
-	line-height: .7;
+	letter-spacing: 0;
+	font-size: 1.5em;
+	line-height: 1;
 }
 .play-movie {
+	background: rgba(255,255,255,.1);
+	border-radius: 30px;
+	.transition(all .1s ease-out);
+	padding: 0 20px;
 	display: inline-block;
 	float: left;
 	clear: both;	
-	margin-top: 40px;
-	font-size: 2.5em;
+	margin-top: 50px;
+	font-size: 2em;
 	letter-spacing: 1px;
 	font-family: bebas_neuebook;
 	text-transform: uppercase;
 	color: white;
-	.transition(all .5s ease-in);
+	
 	&:hover {
-		color: white;
-		text-decoration: underline;
-		.glyphicon-play {
-			margin-left: 15px;
-			color: white;
-			
-		}	
+		.transform(translateX(5px));
+		text-decoration: none;
 	}
 	&:active, &:visited {
 		color: white;
+		text-decoration: none;
 	}
 	.glyphicon-play {
 		float: right;
 		font-size: .5em;
 		line-height: 1.8;
 		margin-left: 10px;
-		border: 2px solid white;
-		.border-radius(50%);
-		width: 40px;
-		height: 40px;
 		margin-top: 8px;
 		padding-left: 10px;
 		padding-top: 0;
-		.transition(all .3s ease-out);
 		color: white;
 	}
 }
@@ -174,7 +255,7 @@ h3.copy {
 	color: @color-red;
 	//border-bottom: 2px solid @color-red;
 	text-decoration: underline;
-	font-size: 2em;
+	font-size: 1.4em;
 	display: inline-block;
 	clear: both;
 	float: left;
@@ -196,6 +277,7 @@ h3.copy {
 	}
 	p {
 		font-family: bitterregular;
+		font-size: .8em;
 	}
 }
 
@@ -203,7 +285,37 @@ h3.copy {
 .signup {
 	display: none;
 }
+.login {
 
+}
+.blurb {
+	margin-top: 90px;
+}
+.login-form {
+	margin-top: 95px;
+}
+.btn-default {
+	border-color: #ccc;
+	&:hover {
+		background-color: white;
+		border-color: @color-red;
+		color: @color-red;
+	}
+}
+.btn-link {
+	color: #333;
+	&:hover {
+		color: @color-red;
+	}
+}
+.control-label {
+	display: none;
+}
+.page-title {
+	ont-size: 3em;
+	font-family: bebas_neuebook;
+	color: @color-red;
+}
 .noselect() {
     -webkit-touch-callout: none;
     -webkit-user-select: none;
@@ -342,6 +454,56 @@ h1, h2, h3, h4, h5, h6 {
 			color: white;
 		}
 	} // .calculate
+}
+
+// about page
+.about-view {
+	min-height: 100%;
+	height: 100%;
+	width: 100%;
+	position: absolute;
+	
+	.about-img {
+		width: 50%;
+		padding: 3px;
+		border: 1px solid @color-red;
+	}
+	.scroll-below-fold span {
+		color: @color-red;
+	}
+	.contact-info {
+		//font-family: bebas_neuebook;
+		font-size: 1.1em;
+		a {
+			color: @color-red;
+			display: block;
+		}
+	}
+
+	.about-veesee {
+		padding-top: 184px;
+		p {
+			padding-top: 40px;
+		}
+		h1 {
+			font-size: 3em;
+			font-family: bebas_neuebook;
+			color: @color-red;
+		}
+	}
+
+	.about-founders {
+		a {
+			color: @color-red;
+		}
+		h2 {
+			text-decoration: underline;
+			font-size: 1.6em;
+			font-family: bebas_neuebook;
+			color: @color-red;
+		}
+	}
+
 }
 
 

@@ -1,8 +1,8 @@
 .idea
-node_modules/
 coverage/
 reports/
-public/reports/
+public/reports
+public/assets
 Designs/
 
 # Logs
