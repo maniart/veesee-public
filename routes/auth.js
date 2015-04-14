@@ -30,15 +30,15 @@ function login(response, user) {
     signed: true,
     maxAge: config.cookieMaxAge  
   }
-  response.cookie('veesee_user_id', user._id, options);
-  response.cookie('veesee_auth_token', user.auth_token, options);
+  response.cookie(/*private*/, user._id, options);
+  response.cookie(/*private*/, user.auth_token, options);
   response.json({
     user: _.omit(user.toObject(), ['password', 'auth_token']) 
   });   
 }
 function logout(response) {
-  response.clearCookie('veesee_user_id');
-  response.clearCookie('veesee_auth_token');
+  response.clearCookie(/*private*/);
+  response.clearCookie(/*private*/);
   response.json({ success: 'User successfully logged out.' });
 }
 
@@ -113,8 +113,8 @@ router.post('/logout', function(req, res) {
 // - remove_account
 router.post('/remove_account', function(req, res) {
   User.remove({
-    id: req.signedCookies.veesee_user_id,
-    auth_token: req.signedCookies.veesee_auth_token
+    id: req.signedCookies./*private*/,
+    auth_token: req.signedCookies./*private*/
   }, function(err){
     if(err) {
       res.json({ error: 'Error while trying to delete user.' }); 
