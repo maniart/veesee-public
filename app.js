@@ -41,10 +41,10 @@ var express = require('express')
 /* middlewares */
 
 // - populates req.signedCookies
-app.use(cookieParser('123foracheaperprice'));
+app.use(cookieParser(/* private */));
 // - populates req.session, needed for CSRF
 app.use(session({
-  secret: 'buyingbetterproduce321',
+  secret: /* private */,
   resave: false,
   saveUninitialized: false
 }));
