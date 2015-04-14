@@ -9,7 +9,7 @@ var Model = require('../models/loginModel')
 
 /* exports */
 
-module.exports = function about() {
+module.exports = function login() {
 	  
   View.create({ 
   	model: Model.create() 
