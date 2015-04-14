@@ -48,8 +48,8 @@ function logout(response) {
 // - check auth
 router.get('/', function(req, res) {
   User.find({
-    _id: req.signedCookies.veesee_user_id,
-    auth_token: req.signedCookies.veesee_auth_token   
+    _id: req.signedCookies./*private*/,
+    auth_token: req.signedCookies./*private*/   
   }, 'email', function(err, user) {
     if(err) {
       res.json({
