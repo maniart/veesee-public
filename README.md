@@ -2,4 +2,4 @@
 webapp-veesee
 =============
 
-Code base for a startup valuating startups. #yeah #meta
+Code base for [VeeSee](http://veesee.co): Deal Tracking and Valuation startup 
